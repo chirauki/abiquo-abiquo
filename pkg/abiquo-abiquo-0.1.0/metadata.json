@@ -15,27 +15,25 @@
     {
       "name": "puppetlabs/stdlib",
       "version_requirement": ">= 4.1.0"
+    },
+    {
+      "name": "puppetlabs/apache",
+      "version_requirement": ">= 0.11.0"
     }
   ],
   "types": [
 
   ],
   "checksums": {
-    "Modulefile": "bfc265fa5e48afd212325a44206a51f7",
+    "Modulefile": "8fefa86797353d43ff85aad156d3d025",
     "README": "b5d8b0d1e38e7f64738102f26538a285",
-    "files/abiquo.conf": "7f7ff0ca39880295d304ce00a3a60917",
-    "files/abiquo_ssl.conf": "5e4a8e4bc3a6b0cb77e987a50f907219",
-    "files/proxy_ajp.conf": "ae406258bb0a86e4540a7249d18d44b6",
-    "files/server.xml": "bc4ef2a29997a95b0fd15585ff3eb8a4",
-    "files/ssl.conf": "3aa40a3636cd8e008cfd37554a957a9c",
     "lib/facter/check_kinton.rb": "c097ffd04a23a13d329ee91904610709",
-    "manifests/apache.pp": "94e131e18a8c890052ef10d2f1ed725a",
     "manifests/api.pp": "9a5c6ee8c91a2e9d2729f328a3fe2eb7",
-    "manifests/client.pp": "1c155166656b212784c0bc9423f5cd2a",
-    "manifests/init.pp": "1fc0fe1da7654af90dde7f0d7ab4a76b",
+    "manifests/client.pp": "1656b6a66793f2005f7306b2d2491440",
+    "manifests/init.pp": "ef5191d1016296943744fbf09ee83375",
     "manifests/jdk.pp": "92eaa4d759e9131d8b30c952f5c9730e",
     "manifests/mariadb.pp": "d1b9f0ac97cccc1d6749e33cc276192d",
-    "manifests/params.pp": "f4ce0b8c939ee58891d1b917e34aae67",
+    "manifests/params.pp": "e98ed0953cea94ba6909ec3e6c396212",
     "manifests/rabbit.pp": "4cd6118db20fb41444d68a4b5fdf4aa2",
     "manifests/redis.pp": "364e0f5ee02326d0748e54f22bc422f2",
     "manifests/remoteservice.pp": "565a235504ef1a585fbe69a99c2c1a15",
@@ -44,6 +42,7 @@
     "templates/properties.header.erb": "e08454f6d892aa9be4e875ebe0ad2dc5",
     "templates/properties.publiccloud.erb": "3fc51dcdaa0bd39ad7395e00ca144975",
     "templates/properties.server.erb": "60336c2f6f10f9f8e3fde02c4e7ab899",
+    "templates/server.xml.erb": "9e32a6b6876cae408417c102d366aea7",
     "tests/init.pp": "3d702ec913bcac6b94cef9d4acc8acd5"
   }
 }

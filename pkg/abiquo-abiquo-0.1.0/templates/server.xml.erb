@@ -38,13 +38,14 @@
                connectionTimeout="20000"
                URIEncoding="UTF-8"
                redirectPort="8443"
-               secure="true"
+               secure="<%= @secure %>"
                />
  
     <Connector port="8010" protocol="AJP/1.3"
                enableLookups="false"
                tomcatAuthentication="false"
-               connectionTimeout="20000" secure="true"
+               connectionTimeout="20000"
+               secure="<%= @secure %>"
                />
 
 
