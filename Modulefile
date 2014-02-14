@@ -10,3 +10,4 @@ project_page 'UNKNOWN'
 ## Add dependencies, if any:
 dependency 'puppetlabs/concat', '>= 1.0.0'
 dependency 'puppetlabs/stdlib', '>= 4.1.0'
+dependency 'puppetlabs/apache', '>= 0.11.0'

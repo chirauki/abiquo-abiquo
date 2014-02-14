@@ -1,6 +1,7 @@
 # == Class: abiquo
 #
-# Full description of class abiquo here.
+# This is the base class to provide Abiquo components.
+# Components available are API, client and remote service
 #
 # === Parameters
 #
@@ -61,6 +62,12 @@ class abiquo inherits abiquo::params {
     notify  => Service['abiquo-tomcat']
   }
 
+  # Used in properties file
+  $apilocation = $secure ? {
+    true  => "https://${ipaddress}/api",
+    false => "http://${ipaddress}/api",
+  }
+
   abiproperties::register { 'properties header':
     content => template('abiquo/properties.header.erb'),
     order   => '01'
@@ -79,5 +86,15 @@ class abiquo inherits abiquo::params {
       order   => $order,
       content => "$body"
     }
+  }
+
+  file { '/opt/abiquo/tomcat/conf/server.xml':
+    ensure    => present,
+    owner     => 'root',
+    group     => 'root',
+    mode      => '0644',
+    content   => template('abiquo/server.xml.erb'),
+    notify    => Service['abiquo-tomcat'],
+    require   => Concat['/opt/abiquo/config/abiquo.properties']
   }
 }
