@@ -22,14 +22,21 @@ class abiquo::remoteservice inherits abiquo {
   }
 
   $rabbitaddress = defined(Package['abiquo-api']) ? {
-    flase => $apiaddress,
+    false => $apiaddress,
     true  => $::ipaddress,
+  }
+
+  file { '/opt/abiquo/config':
+    ensure  => directory,
+    owner   => 'root',
+    mode    => '0755',
+    require => Package[$rspackages]
   }
 
   abiproperties::register { 'Server properties for RS':
     content => template("abiquo/properties.${rstype}.erb"),
     order   => '02',
-    require => Package["abiquo-vsm"],
+    require => [ Package["abiquo-vsm"], File['/opt/abiquo/config'] ]
     notify  => Service["abiquo-tomcat"]
   }
 
