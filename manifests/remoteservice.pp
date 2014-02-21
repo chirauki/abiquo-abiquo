@@ -36,7 +36,7 @@ class abiquo::remoteservice inherits abiquo {
   abiproperties::register { 'Server properties for RS':
     content => template("abiquo/properties.${rstype}.erb"),
     order   => '02',
-    require => [ Package["abiquo-vsm"], File['/opt/abiquo/config'] ]
+    require => [ Package["abiquo-vsm"], File['/opt/abiquo/config'] ],
     notify  => Service["abiquo-tomcat"]
   }
 
