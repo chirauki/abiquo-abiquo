@@ -61,10 +61,9 @@ class abiquo inherits abiquo::params {
   }
 
   host { 'Add hostname to /etc/hosts':
-    ensure        => present,
-    name          => $::hostname,
-    ip            => $::ipaddress,
-    host_aliases  => $::fqdn
+    ensure  => present,
+    name    => $::hostname,
+    ip      => $::ipaddress,
   }
 
   concat { '/opt/abiquo/config/abiquo.properties':
