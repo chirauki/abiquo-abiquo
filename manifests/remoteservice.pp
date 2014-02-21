@@ -1,4 +1,8 @@
-class abiquo::remoteservice inherits abiquo {
+class abiquo::remoteservice (
+  $abiquo_versio  = $abiquo::params::abiquo_version,
+  $rstype         = $abiquo::params::rstype,
+  $apiaddress     = $abiquo::params::apiaddress
+) {
   include abiquo::jdk
   include abiquo::redis
   
