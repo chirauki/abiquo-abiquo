@@ -1,5 +1,5 @@
 class abiquo::remoteservice (
-  $abiquo_versio  = $abiquo::params::abiquo_version,
+  $abiquo_version = $abiquo::params::abiquo_version,
   $rstype         = $abiquo::params::rstype,
   $apiaddress     = $abiquo::params::apiaddress
 ) {
