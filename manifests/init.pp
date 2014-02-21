@@ -56,6 +56,17 @@ class abiquo inherits abiquo::params {
     require       => Yumrepo['Abiquo-Base']
   }
 
+  class { 'selinux': 
+    mode => 'disabled'
+  }
+
+  host { 'Add hostname to /etc/hosts':
+    ensure        => present,
+    name          => $::hostname,
+    ip            => $::ipaddress,
+    host_aliases  => $::fqdn
+  }
+
   concat { '/opt/abiquo/config/abiquo.properties':
     owner   => 'root',
     mode    => '0755',
