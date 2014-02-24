@@ -78,15 +78,14 @@ class abiquo inherits abiquo::params {
   }
 
   # Used in properties file
+  $apiip = $::ec2_public_ipv4 ? {
+    undef     =>  $::ipaddress,
+    default   => $::ec2_public_ipv4
+  }
+
   $apilocation = $secure ? {
-    if $::ec2_public_ipv4 != undef {
-      true  => "https://${ec2_public_ipv4}/api",
-      false => "http://${ec2_public_ipv4}/api",
-    }
-    else {
-      true  => "https://${ipaddress}/api",
-      false => "http://${ipaddress}/api",
-    }
+      true  => "https://${apiip}/api",
+      false => "http://${apiip}/api",
   }
 
   abiproperties::register { 'properties header':

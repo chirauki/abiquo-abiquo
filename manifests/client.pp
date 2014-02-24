@@ -74,6 +74,7 @@ class abiquo::client inherits abiquo {
       undef     =>  $::ipaddress,
       default   => $::ec2_public_ipv4
     }
+    
     exec { 'replace API location in ui config':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => "sed -i 's/localhost/${::ipaddress}/g' /var/www/html/ui/config/client-config.json",
