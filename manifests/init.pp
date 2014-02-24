@@ -60,6 +60,11 @@ class abiquo inherits abiquo::params {
     mode => 'disabled'
   }
 
+  service { 'iptables':
+    ensure  => stopped,
+    enable  => false
+  }
+
   host { 'Add hostname to /etc/hosts':
     ensure  => present,
     name    => $::hostname,
@@ -74,8 +79,14 @@ class abiquo inherits abiquo::params {
 
   # Used in properties file
   $apilocation = $secure ? {
-    true  => "https://${ipaddress}/api",
-    false => "http://${ipaddress}/api",
+    if $::ec2_public_ipv4 != undef {
+      true  => "https://${ec2_public_ipv4}/api",
+      false => "http://${ec2_public_ipv4}/api",
+    }
+    else {
+      true  => "https://${ipaddress}/api",
+      false => "http://${ipaddress}/api",
+    }
   }
 
   abiproperties::register { 'properties header':
