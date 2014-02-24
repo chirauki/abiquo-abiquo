@@ -79,7 +79,7 @@ class abiquo inherits abiquo::params {
 
   # Used in properties file
   $apiip = $::ec2_public_ipv4 ? {
-    undef     =>  $::ipaddress,
+    undef     => $::ipaddress,
     default   => $::ec2_public_ipv4
   }
 

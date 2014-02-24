@@ -71,13 +71,13 @@ class abiquo::client inherits abiquo {
     }
     
     $apiip = $::ec2_public_ipv4 ? {
-      undef     =>  $::ipaddress,
+      undef     => $::ipaddress,
       default   => $::ec2_public_ipv4
     }
     
     exec { 'replace API location in ui config':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
-      command => "sed -i 's/localhost/${::ipaddress}/g' /var/www/html/ui/config/client-config.json",
+      command => "sed -i 's/localhost/${apiip}/g' /var/www/html/ui/config/client-config.json",
       onlyif  => "grep localhost /var/www/html/ui/config/client-config.json",
       require => Package['abiquo-ui']
     }
