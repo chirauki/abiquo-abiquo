@@ -5,6 +5,7 @@ class abiquo::remoteservice (
 ) {
   include abiquo::jdk
   include abiquo::redis
+  include abiquo::firewall
   
   if versioncmp($abiquo_version, "2.7") <= 0 {
     $rspackages = $rstype ? {
