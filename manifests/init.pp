@@ -38,6 +38,7 @@
 #
 class abiquo inherits abiquo::params {
   include concat::setup
+  include abiquo::firewall
   
   yumrepo { "Abiquo-Base":
     name          => "abiquo-base",
@@ -58,11 +59,6 @@ class abiquo inherits abiquo::params {
 
   class { 'selinux': 
     mode => 'disabled'
-  }
-
-  service { 'iptables':
-    ensure  => stopped,
-    enable  => false
   }
 
   host { 'Add hostname to /etc/hosts':
