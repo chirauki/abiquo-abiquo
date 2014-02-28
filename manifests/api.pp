@@ -43,6 +43,11 @@ class abiquo::api inherits abiquo {
     require => [ $execdep ]
   }
 
+  firewall { '100 allow rabbit access':
+    port   => 5672,
+    proto  => tcp,
+    action => accept,
+  }
 
   service { "abiquo-tomcat":
     ensure    => running,
