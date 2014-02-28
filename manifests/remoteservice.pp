@@ -20,6 +20,12 @@ class abiquo::remoteservice (
     }
   }
 
+  firewall { '100 allow 8009 access for RS tomcat':
+    port   => 8009,
+    proto  => tcp,
+    action => accept,
+  }
+
   package { $rspackages:
     ensure  => latest,
     require => [ Yumrepo['Abiquo-Rolling'], Package['redis'] ],
