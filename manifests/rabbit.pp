@@ -1,4 +1,4 @@
-class abiquo::rabbit inherits abiquo {
+class abiquo::rabbit {
   package { "rabbitmq-server":
     ensure  => latest,
     require => Yumrepo["Abiquo-Base"]

@@ -1,4 +1,4 @@
-class abiquo::redis inherits abiquo {
+class abiquo::redis {
   user { 'redis':
     ensure  => present,
     require => Yumrepo['Abiquo-Base']

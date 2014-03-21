@@ -1,6 +1,19 @@
-class abiquo::client inherits abiquo {
+class abiquo::client (
+  $abiquo_version = "2.9",
+  $secure         = true,
+  $api_address    = $::ec2_public_ipv4 ? {
+                      undef     => $::ipaddress,
+                      default   => $::ec2_public_ipv4
+                    }
+) {
   include abiquo::jdk
   
+  if ! defined(Class['abiquo']) {
+    class { 'abiquo': 
+      abiquo_version => $abiquo_version
+    }
+  }
+
   if versioncmp($abiquo_version, "2.7") <= 0 {
     $uipkg = 'abiquo-client-premium'
   }
@@ -69,16 +82,16 @@ class abiquo::client inherits abiquo {
       command => "yum remove abiquo-client-premium",
       onlyif  => "test -d /opt/abiquo/tomcat/client-premium"
     }
-    
-    $apiip = $::ec2_public_ipv4 ? {
-      undef     => $::ipaddress,
-      default   => $::ec2_public_ipv4
-    }
-    
-    exec { 'replace API location in ui config':
-      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
-      command => "sed -i 's/localhost/${apiip}/g' /var/www/html/ui/config/client-config.json",
-      onlyif  => "grep localhost /var/www/html/ui/config/client-config.json",
+
+    file { '/var/www/html/ui/config/client-config.json':
+      ensure  => present,
+      owner   => "root",
+      group   => "root",
+      mode    => "0644",
+      content => $secure ? {
+          true   => jsonreplace("/var/www/html/ui/config/client-config.json", "config.endpoint", "https://${api_address}/api"),
+          false  => jsonreplace("/var/www/html/ui/config/client-config.json", "config.endpoint", "http://${api_address}/api"),
+        },
       require => Package['abiquo-ui']
     }
 

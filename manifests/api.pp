@@ -1,8 +1,15 @@
-class abiquo::api inherits abiquo {
+class abiquo::api (
+  $abiquo_version = "2.9",
+  $secure         = true,
+) {
   include abiquo::jdk
   include abiquo::redis
   include abiquo::rabbit
   include abiquo::mariadb
+  
+  class { 'abiquo': 
+    abiquo_version => $abiquo_version
+  }
 
   $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m"]
 
@@ -37,12 +44,6 @@ class abiquo::api inherits abiquo {
     $execdep = Exec['Abiquo database schema']
   }
 
-  abiproperties::register { 'Server properties for API':
-    content => template('abiquo/properties.server.erb'),
-    order   => '02',
-    require => [ $execdep ]
-  }
-
   firewall { '100 allow rabbit access':
     port   => 5672,
     proto  => tcp,
@@ -56,4 +57,26 @@ class abiquo::api inherits abiquo {
     pattern   => "java.*/opt/abiquo/tomcat",
     require   => [ Package[$apipkgs], $execdep, Concat['/opt/abiquo/config/abiquo.properties'] ]
   }
+
+  abiproperties::register { 'Server properties for API':
+    content => "[server]\n",
+    order   => '05',
+  }
+
+  # Minimum set of properties to define.
+  if ! defined(Abiquo::Property['abiquo.server.sessionTimeout']) { ensure_resource('abiquo::property', 'abiquo.server.sessionTimeout', {'value' => '60', 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.server.mail.server']) { ensure_resource('abiquo::property', "abiquo.server.mail.server", {'value' => "127.0.0.1", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.server.mail.user']) { ensure_resource('abiquo::property', "abiquo.server.mail.user", { 'value' => "none@none.es", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.server.mail.password']) { ensure_resource('abiquo::property', "abiquo.server.mail.password", { 'value' => "none", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.rabbitmq.username']) { ensure_resource('abiquo::property', "abiquo.rabbitmq.username", { 'value' => "guest", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.rabbitmq.password']) { ensure_resource('abiquo::property', "abiquo.rabbitmq.password", { 'value' => "guest", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.rabbitmq.host']) { ensure_resource('abiquo::property', "abiquo.rabbitmq.host", { 'value' => "127.0.0.1", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.rabbitmq.port']) { ensure_resource('abiquo::property', "abiquo.rabbitmq.port", { 'value' => "5672", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.database.user']) { ensure_resource('abiquo::property', "abiquo.database.user", { 'value' => "root", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.database.password']) { ensure_resource('abiquo::property', "abiquo.database.password", { 'value' => "", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.database.host']) { ensure_resource('abiquo::property', "abiquo.database.host", { 'value' => "127.0.0.1", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.auth.module']) { ensure_resource('abiquo::property', "abiquo.auth.module", { 'value' => "abiquo", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.server.api.location']) { ensure_resource('abiquo::property', "abiquo.server.api.location", { 'value' => "http://localhost/api", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.m.identity']) { ensure_resource('abiquo::property', "abiquo.m.identity", { 'value' => "admin", 'section' => "server" }) }
+  if ! defined(Abiquo::Property['abiquo.m.credential']) { ensure_resource('abiquo::property', "abiquo.m.credential", { 'value' => "xabiquo", 'section' => "server" }) }
 }

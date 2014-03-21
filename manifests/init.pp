@@ -36,14 +36,16 @@
 #
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
-class abiquo inherits abiquo::params {
+class abiquo (
+  $abiquo_version = "2.9"
+) {
   include concat::setup
   include abiquo::firewall
-  
+
   yumrepo { "Abiquo-Base":
     name          => "abiquo-base",
     descr         => "abiquo-base-${abiquo_version}",
-    baseurl       => "${baserepourl}",
+    baseurl       => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
     gpgcheck      => 0,
     http_caching  => "none"
   }
@@ -51,7 +53,7 @@ class abiquo inherits abiquo::params {
   yumrepo { "Abiquo-Rolling":
     name          => "abiquo-rolling",
     descr         => "abiquo-rolling",
-    baseurl       => "${rollingrepourl}",
+    baseurl       => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
     gpgcheck      => 0,
     http_caching  => "none",
     require       => Yumrepo['Abiquo-Base']
@@ -73,17 +75,6 @@ class abiquo inherits abiquo::params {
     notify  => Service['abiquo-tomcat']
   }
 
-  # Used in properties file
-  $apiip = $::ec2_public_ipv4 ? {
-    undef     => $::ipaddress,
-    default   => $::ec2_public_ipv4
-  }
-
-  $apilocation = $secure ? {
-      true  => "https://${apiip}/api",
-      false => "http://${apiip}/api",
-  }
-
   abiproperties::register { 'properties header':
     content => template('abiquo/properties.header.erb'),
     order   => '01'
@@ -101,6 +92,25 @@ class abiquo inherits abiquo::params {
       target  => '/opt/abiquo/config/abiquo.properties',
       order   => $order,
       content => "$body"
+    }
+  }
+
+  define property($propname="", $value, $section) {
+    if $propname == "" {
+      $realname = $title
+    } else {
+      $realname = $propname
+    }
+
+    $offset = $section ? {
+      'server'          => 10,
+      'remote-services' => 20,
+    }
+
+    $sum = stringsum($realname)
+    abiproperties::register { "property_$realname":
+      content => "$realname = $value\n",
+      order   => "$offset",
     }
   }
 

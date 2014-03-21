@@ -1,4 +1,4 @@
-class abiquo::mariadb inherits abiquo {
+class abiquo::mariadb {
   package { ["postfix", "mysql-libs"]:
     ensure => purged,
   }
