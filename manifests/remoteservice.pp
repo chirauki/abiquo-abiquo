@@ -1,7 +1,6 @@
 class abiquo::remoteservice (
   $abiquo_version = "2.9",
-  $rstype         = "publiccloud",
-  $api_address    = "localhost"
+  $rstype         = "publiccloud"
 ) {
   include abiquo::jdk
   include abiquo::redis

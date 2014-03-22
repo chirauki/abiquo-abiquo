@@ -15,12 +15,16 @@ module Puppet::Parser::Functions
       raise Puppet::ParseError, ("hash2props(): wrong number of arguments (#{args.length}; must be 3)")
     end
 
-    json = File.read(args[0])
-    jsonp = JSON.parse(json)
+    if File.exists?(args[0]) 
+      json = File.read(args[0])
+      jsonp = JSON.parse(json)
 
-    jsonp[args[1]] = args[2]
+      jsonp[args[1]] = args[2]
 
-    JSON.pretty_generate(jsonp)
+      JSON.pretty_generate(jsonp)
+    else
+      "{}"
+    end
   end
 
 end

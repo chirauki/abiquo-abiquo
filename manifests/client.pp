@@ -22,13 +22,13 @@ class abiquo::client (
     $uipkg = "abiquo-ui"
   }
 
-  package { $uipkg:
-    ensure  => latest,
-    require => [ Yumrepo['Abiquo-Rolling'], Package['jdk'] ],
-    notify  => Service['abiquo-tomcat']
-  }
+  if $uipkg == "abiquo-ui" {
+    package { 'abiquo-ui':
+      ensure  => latest,
+      require => [ Yumrepo['Abiquo-Rolling'], Package['jdk'] ],
+      notify  => Service['abiquo-tomcat'],
+    }
 
-  if $uipkg == "abiquo-ui" {    
     class { 'apache':
       default_mods        => false,
       default_vhost       => false,
@@ -75,37 +75,27 @@ class abiquo::client (
         require         => Package['abiquo-ui']
       }
     }
-
-    
+ 
     exec { 'Remove old client-premium':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => "yum remove abiquo-client-premium",
       onlyif  => "test -d /opt/abiquo/tomcat/client-premium"
     }
 
-    file { '/var/www/html/ui/config/client-config.json':
-      ensure  => present,
-      owner   => "root",
-      group   => "root",
-      mode    => "0644",
-      content => $secure ? {
-          true   => jsonreplace("/var/www/html/ui/config/client-config.json", "config.endpoint", "https://${api_address}/api"),
-          false  => jsonreplace("/var/www/html/ui/config/client-config.json", "config.endpoint", "http://${api_address}/api"),
-        },
-      require => Package['abiquo-ui']
-    }
-
-    exec { 'Set the right protocol in UI API location':
+    exec { 'Set API and protocol in UI config':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => $secure ? {
-        true  => "sed -i 's/http/https/g' /var/www/html/ui/config/client-config.json",
-        false => "sed -i 's/https/http/g' /var/www/html/ui/config/client-config.json",
-      },
-      onlyif  => $secure ? { 
-        true  => "grep http: /var/www/html/ui/config/client-config.json",
-        false => "grep https: /var/www/html/ui/config/client-config.json",
+        true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${api_address}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+        false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${api_address}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
       },
       require => Package['abiquo-ui']
+    }
+  }
+  else {
+    package { 'client-premium':
+      ensure  => latest,
+      require => [ Yumrepo['Abiquo-Rolling'], Package['jdk'] ],
+      notify  => Service['abiquo-tomcat']
     }
   }
 }
