@@ -80,9 +80,7 @@ class { 'abiquo::remoteservice':
 As it is advisable to set up V2V services in a separate machine from the RS server, this class will install the V2V module in a standalone server.
 
 ```
-class { 'abiquo::v2v':
-  rstype         => 'publiccloud'
-}
+class { 'abiquo::v2v': }
 ```
 
 ####Parameters
