@@ -1,53 +1,43 @@
-class abiquo::remoteservice (
-  $rstype         = "publiccloud"
-) {
+class abiquo::v2v {
   include abiquo::jdk
-  include abiquo::redis
   include abiquo::firewall
-  
-  if versioncmp($abiquo::abiquo_version, "2.7") <= 0 {
-    $rspackages = $rstype ? {
-      publiccloud  => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector" ],
-      datacenter   => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-ssm", "abiquo-am"]
-    }
-  }
-  else {
-    $rspackages = $rstype ? {
-      publiccloud => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-cpp"],
-      datacenter  => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-ssm", "abiquo-am"]
+
+  if ! defined(Firewall['100 allow 8009 access for RS tomcat']) {
+    firewall { '100 allow 8009 access for RS tomcat':
+      port   => 8009,
+      proto  => tcp,
+      action => accept,
     }
   }
 
-  firewall { '100 allow 8009 access for RS tomcat':
-    port   => 8009,
-    proto  => tcp,
-    action => accept,
-  }
-
-  package { $rspackages:
+  package { "abiquo-v2v":
     ensure  => latest,
-    require => [ Yumrepo['Abiquo-Rolling'], Package['redis'] ],
+    require => Yumrepo['Abiquo-Rolling'],
     notify  => Service['abiquo-tomcat']
   }
 
-  file { '/opt/abiquo/config':
-    ensure  => directory,
-    owner   => 'root',
-    mode    => '0755',
-    require => Package[$rspackages]
+  if ! defined(File['/opt/abiquo/config']) {  
+    file { '/opt/abiquo/config':
+      ensure  => directory,
+      owner   => 'root',
+      mode    => '0755',
+      require => Package['abiquo-v2v']
+    }
   }
 
   if ! defined(Service['abiquo-tomcat']) {
     service { 'abiquo-tomcat':
       ensure  => running,
       enable  => true,
-      require => [ Service['redis'], Concat['/opt/abiquo/config/abiquo.properties'] ]
+      require => Concat['/opt/abiquo/config/abiquo.properties']
     }
   }
   
-  abiproperties::register { 'Server properties for RS':
-    content => "[remote-services]\n",
-    order   => '15',
+  if ! defined(Abiproperties::Register['Server properties for RS']) {
+    abiproperties::register { 'Server properties for RS':
+      content => "[remote-services]\n",
+      order   => '15',
+    }
   }
 
   # Minimum set of properties to define.

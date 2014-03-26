@@ -38,7 +38,7 @@
 #
 class abiquo (
   $abiquo_version = "2.9"
-) {
+){
   include concat::setup
   include abiquo::firewall
 
@@ -52,7 +52,7 @@ class abiquo (
 
   yumrepo { "Abiquo-Rolling":
     name          => "abiquo-rolling",
-    descr         => "abiquo-rolling",
+    descr         => "abiquo-rolling-${abiquo_version}",
     baseurl       => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
     gpgcheck      => 0,
     http_caching  => "none",

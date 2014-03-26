@@ -1,5 +1,4 @@
 class abiquo::client (
-  $abiquo_version = "2.9",
   $secure         = true,
   $api_address    = $::ec2_public_ipv4 ? {
                       undef     => $::ipaddress,
@@ -7,18 +6,12 @@ class abiquo::client (
                     }
 ) {
   include abiquo::jdk
-  
-  if ! defined(Class['abiquo']) {
-    class { 'abiquo': 
-      abiquo_version => $abiquo_version
-    }
-  }
 
-  if versioncmp($abiquo_version, "2.7") <= 0 {
+  if versioncmp($abiquo::abiquo_version, "2.7") <= 0 {
     $uipkg = 'abiquo-client-premium'
   }
   else {
-    notify { "Abiquo version ${abiquo_version} does not use flex client. Selecting abiquo-ui instead.": }
+    notify { "Abiquo version ${abiquo::abiquo_version} does not use flex client. Selecting abiquo-ui instead.": }
     $uipkg = "abiquo-ui"
   }
 

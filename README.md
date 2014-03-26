@@ -11,20 +11,35 @@ Depends on:
  - [puppetlabs/firewall](https://forge.puppetlabs.com/puppetlabs/firewall)
  - [spiette/selinux](https://forge.puppetlabs.com/spiette/selinux)
 
+#Available components
+
+##Abiquo
+
+This is the base class. Its only purpose is to be able to define a different Abiquo version to setup. It defaults to the last publicly available version of Abiquo.
+
+```
+class { 'abiquo':
+  abiquo_version => "2.6"
+}
+```
+
+####Parameters
+
+- **abiquo_version** a string denoting a major version of Abiquo (ie. 2.4, 2.6, etc. Not 2.4.1, 2.4.2, etc.)
+
+
 ##Abiquo API
 
 The Abiquo API class includes the API itself and the M webapp for events and outbound API.
 
 ```
 class { 'abiquo::api':
-  abiquo_version => '2.9',
   secure         => true
 }
 ```
 
 ####Parameters
 
-- **abiquo_version** will be used to determine the mirror to download RPM's from.
 - **secure determines** wether SSL will be set up or not.
 
 
@@ -34,7 +49,6 @@ Client class installs the flex client app for 2.6 or the ui webapp for 2.8+
 
 ```
 class { 'abiquo::client': 
-  abiquo_version => '2.9',
   secure         => true,
   api_address    => $::ipaddress
 }
@@ -42,9 +56,9 @@ class { 'abiquo::client':
 
 ####Parameters
 
-- **abiquo_version** will be used to determine the mirror to download RPM's from.
 - **secure determines** wether SSL will be set up or not in Apache server hosting the UI webapp (2.8+).
 - **api_address** is the IP address to set as ```config.endpoint``` in UI's config file (2.8+).
+
 
 ##Abiquo remote services
 
@@ -52,15 +66,29 @@ This class installs and configures all the remote services needed to run a datac
 
 ```
 class { 'abiquo::remoteservice':
-  abiquo_version => '2.9',
   rstype         => 'publiccloud'
 }
 ```
 
 ####Parameters
 
-- **abiquo_version** will be used to determine the mirror to download RPM's from.
 - **rstype** determines the type of RS that will be setup. It can be ```datacenter``` or ```publiccloud```.
+
+
+##Abiquo V2V
+
+As it is advisable to set up V2V services in a separate machine from the RS server, this class will install the V2V module in a standalone server.
+
+```
+class { 'abiquo::v2v':
+  rstype         => 'publiccloud'
+}
+```
+
+####Parameters
+
+This class does not take parameters. You can also set any of its properties using the property resource.
+
 
 ##Abiquo properties
 
@@ -81,3 +109,41 @@ abiquo::property { "some.property":
 - **value** is the value of the property you want to set.
 - **section** is the section in the properties file where the property should be. It can be either ```server``` or ```remote-services```
 
+
+#Examples
+
+##Monolithic install
+
+```
+class { 'abiquo::api': }
+class { 'abiquo::client': }
+class { 'abiquo::remoteservice': }
+class { 'abiquo::v2v': }
+```
+
+##Server only (API and GUI)
+
+```
+class { 'abiquo::api': }
+class { 'abiquo::client': }
+```
+
+##Remote services for Public cloud regions
+
+You will probably need to set the Rabbit IP address in the RS properties file:
+
+```
+abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-serivces" }
+class { 'abiquo::remoteservice': }
+```
+
+##Remote services for in premises datacenter
+
+Again, you will need to set some properties (Note, the module will not ensure the repository is mounted):
+
+```
+abiquo::property{ 'abiquo.appliancemanager.localRepositoryPath': value => "/opt/vm_repository/", section => "remote-serivces" }
+abiquo::property{ 'abiquo.appliancemanager.repositoryLocation': value => "192.168.2.50:/opt/vm_repository", section => "remote-serivces" }
+abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-serivces" }
+class { 'abiquo::remoteservice': rstype => 'datacenter' }
+```

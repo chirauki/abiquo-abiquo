@@ -1,5 +1,4 @@
 class abiquo::api (
-  $abiquo_version = "2.9",
   $secure         = true,
 ) {
   include abiquo::jdk
@@ -7,10 +6,6 @@ class abiquo::api (
   include abiquo::rabbit
   include abiquo::mariadb
   
-  class { 'abiquo': 
-    abiquo_version => $abiquo_version
-  }
-
   $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m"]
 
   exec { 'Stop Abiquo tomcat before upgrade.':
