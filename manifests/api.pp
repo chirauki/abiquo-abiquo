@@ -5,8 +5,9 @@ class abiquo::api (
   include abiquo::redis
   include abiquo::rabbit
   include abiquo::mariadb
+  include abiquo::tomcat
   
-  $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m"]
+  $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m", "zookeeper"]
 
   exec { 'Stop Abiquo tomcat before upgrade.':
     path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
@@ -43,14 +44,6 @@ class abiquo::api (
     port   => 5672,
     proto  => tcp,
     action => accept,
-  }
-
-  service { "abiquo-tomcat":
-    ensure    => running,
-    enable    => true,
-    hasstatus => false,
-    pattern   => "java.*/opt/abiquo/tomcat",
-    require   => [ Package[$apipkgs], $execdep, Concat['/opt/abiquo/config/abiquo.properties'] ]
   }
 
   abiproperties::register { 'Server properties for API':

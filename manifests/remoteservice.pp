@@ -4,6 +4,7 @@ class abiquo::remoteservice (
   include abiquo::jdk
   include abiquo::redis
   include abiquo::firewall
+  include abiquo::tomcat
   
   if versioncmp($abiquo::abiquo_version, "2.7") <= 0 {
     $rspackages = $rstype ? {
@@ -35,14 +36,6 @@ class abiquo::remoteservice (
     owner   => 'root',
     mode    => '0755',
     require => Package[$rspackages]
-  }
-
-  if ! defined(Service['abiquo-tomcat']) {
-    service { 'abiquo-tomcat':
-      ensure  => running,
-      enable  => true,
-      require => [ Service['redis'], Concat['/opt/abiquo/config/abiquo.properties'] ]
-    }
   }
   
   abiproperties::register { 'Server properties for RS':

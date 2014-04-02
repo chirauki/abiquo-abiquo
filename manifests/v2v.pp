@@ -1,6 +1,7 @@
 class abiquo::v2v {
   include abiquo::jdk
   include abiquo::firewall
+  include abiquo::tomcat
 
   if ! defined(Firewall['100 allow 8009 access for RS tomcat']) {
     firewall { '100 allow 8009 access for RS tomcat':
@@ -30,13 +31,6 @@ class abiquo::v2v {
       ensure  => running,
       enable  => true,
       require => Concat['/opt/abiquo/config/abiquo.properties']
-    }
-  }
-  
-  if ! defined(Abiproperties::Register['Server properties for RS']) {
-    abiproperties::register { 'Server properties for RS':
-      content => "[remote-services]\n",
-      order   => '15',
     }
   }
 

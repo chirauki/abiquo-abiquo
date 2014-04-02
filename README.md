@@ -19,13 +19,17 @@ This is the base class. Its only purpose is to be able to define a different Abi
 
 ```
 class { 'abiquo':
-  abiquo_version => "2.6"
+  abiquo_version => "3.0",
+  baserepo = "http://myrepo/packages/",
+  rollingrepo = "http://myrepo/updates/"
 }
 ```
 
 ####Parameters
 
-- **abiquo_version** a string denoting a major version of Abiquo (ie. 2.4, 2.6, etc. Not 2.4.1, 2.4.2, etc.)
+- **abiquo_version** a string denoting a major version of Abiquo (ie. 2.4, 2.6, etc. Not 2.4.1, 2.4.2, etc.).
+- **baserepo** a URL if you want to use a custom yum repo for base packages.
+- **rollingrepo** a URL if you want to use a custom yum repo for development version of RPM packages.
 
 
 ##Abiquo API
@@ -66,7 +70,7 @@ This class installs and configures all the remote services needed to run a datac
 
 ```
 class { 'abiquo::remoteservice':
-  rstype         => 'publiccloud'
+  rstype  => 'publiccloud'
 }
 ```
 
@@ -131,7 +135,7 @@ class { 'abiquo::client': }
 You will probably need to set the Rabbit IP address in the RS properties file:
 
 ```
-abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-serivces" }
+abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-services" }
 class { 'abiquo::remoteservice': }
 ```
 
@@ -140,8 +144,8 @@ class { 'abiquo::remoteservice': }
 Again, you will need to set some properties (Note, the module will not ensure the repository is mounted):
 
 ```
-abiquo::property{ 'abiquo.appliancemanager.localRepositoryPath': value => "/opt/vm_repository/", section => "remote-serivces" }
-abiquo::property{ 'abiquo.appliancemanager.repositoryLocation': value => "192.168.2.50:/opt/vm_repository", section => "remote-serivces" }
-abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-serivces" }
+abiquo::property{ 'abiquo.appliancemanager.localRepositoryPath': value => "/opt/vm_repository/", section => "remote-services" }
+abiquo::property{ 'abiquo.appliancemanager.repositoryLocation': value => "192.168.2.50:/opt/vm_repository", section => "remote-services" }
+abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-services" }
 class { 'abiquo::remoteservice': rstype => 'datacenter' }
 ```

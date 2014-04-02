@@ -37,7 +37,9 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version = "2.9"
+  $abiquo_version = "3.0",
+  $baserepo = "",
+  $rollingrepo = ""
 ){
   include concat::setup
   include abiquo::firewall
@@ -45,7 +47,10 @@ class abiquo (
   yumrepo { "Abiquo-Base":
     name          => "abiquo-base",
     descr         => "abiquo-base-${abiquo_version}",
-    baseurl       => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
+    baseurl       => $baserepo ? {
+      ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
+      default   => $baserepo
+    },
     gpgcheck      => 0,
     http_caching  => "none"
   }
@@ -53,7 +58,10 @@ class abiquo (
   yumrepo { "Abiquo-Rolling":
     name          => "abiquo-rolling",
     descr         => "abiquo-rolling-${abiquo_version}",
-    baseurl       => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
+    baseurl       => $rollingrepo ? {
+      ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
+      default   => $rollingrepo
+    },
     gpgcheck      => 0,
     http_caching  => "none",
     require       => Yumrepo['Abiquo-Base']
