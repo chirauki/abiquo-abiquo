@@ -7,7 +7,7 @@ class abiquo::api (
   include abiquo::mariadb
   include abiquo::tomcat
   
-  $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m", "zookeeper"]
+  $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m"]
 
   exec { 'Stop Abiquo tomcat before upgrade.':
     path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
