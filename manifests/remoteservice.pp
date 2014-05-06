@@ -19,23 +19,10 @@ class abiquo::remoteservice (
     }
   }
 
-  firewall { '100 allow 8009 access for RS tomcat':
-    port   => 8009,
-    proto  => tcp,
-    action => accept,
-  }
-
   package { $rspackages:
     ensure  => latest,
     require => [ Yumrepo['Abiquo-Rolling'], Package['redis'] ],
     notify  => Service['abiquo-tomcat']
-  }
-
-  file { '/opt/abiquo/config':
-    ensure  => directory,
-    owner   => 'root',
-    mode    => '0755',
-    require => Package[$rspackages]
   }
   
   abiproperties::register { 'Server properties for RS':

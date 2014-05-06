@@ -71,6 +71,12 @@ class abiquo (
     mode => 'disabled'
   }
 
+  firewall { '100 allow Tomcat access':
+    port   => 8009,
+    proto  => tcp,
+    action => accept,
+  }
+
   host { 'Add hostname to /etc/hosts':
     ensure  => present,
     name    => $::hostname,

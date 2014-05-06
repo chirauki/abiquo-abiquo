@@ -1,11 +1,7 @@
 class abiquo::mariadb {
-  package { ["postfix", "mysql-libs"]:
-    ensure => purged,
-  }
-
   package { [ "MariaDB-server", "MariaDB-client" ]:
     ensure  => latest,
-    require => [ Yumrepo['Abiquo-Base'], Package["postfix"] ]
+    require => Yumrepo['Abiquo-Base']
   }
 
   service { 'mysql':

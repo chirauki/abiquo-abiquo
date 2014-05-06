@@ -3,35 +3,10 @@ class abiquo::v2v {
   include abiquo::firewall
   include abiquo::tomcat
 
-  if ! defined(Firewall['100 allow 8009 access for RS tomcat']) {
-    firewall { '100 allow 8009 access for RS tomcat':
-      port   => 8009,
-      proto  => tcp,
-      action => accept,
-    }
-  }
-
   package { "abiquo-v2v":
     ensure  => latest,
     require => Yumrepo['Abiquo-Rolling'],
     notify  => Service['abiquo-tomcat']
-  }
-
-  if ! defined(File['/opt/abiquo/config']) {  
-    file { '/opt/abiquo/config':
-      ensure  => directory,
-      owner   => 'root',
-      mode    => '0755',
-      require => Package['abiquo-v2v']
-    }
-  }
-
-  if ! defined(Service['abiquo-tomcat']) {
-    service { 'abiquo-tomcat':
-      ensure  => running,
-      enable  => true,
-      require => Concat['/opt/abiquo/config/abiquo.properties']
-    }
   }
 
   # Minimum set of properties to define.

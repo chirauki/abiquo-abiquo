@@ -21,7 +21,7 @@ class abiquo::api (
     notify  => Service['abiquo-tomcat']
   }
 
-  if $::kinton_present {
+  if $::kinton_present == 1 {
     exec { 'Abiquo apply database delta':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => 'mysql kinton < `ls /usr/share/doc/abiquo-server/database/kinton-delta-*.sql`',
