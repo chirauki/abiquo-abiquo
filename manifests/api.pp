@@ -22,13 +22,23 @@ class abiquo::api (
   }
 
   if $::kinton_present == 1 {
+    #notify { "Abiquo liquibase update present. Running.": }
+    exec { 'Abiquo liquibase update':
+      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      command => '/usr/bin/abiquo-liquibase-update',
+      onlyif  => '/usr/bin/which abiquo-liquibase-update',
+      require => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ]
+    }
+
+    #notify { "Applying Abiquo delta.": }
     exec { 'Abiquo apply database delta':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => 'mysql kinton < `ls /usr/share/doc/abiquo-server/database/kinton-delta-*.sql`',
       unless  => 'test `mysql kinton -B --skip-column-names -e "select count(*) from DATABASECHANGELOG where MD5SUM in ($(grep Changeset /usr/share/doc/abiquo-server/database/kinton-delta-* | awk -F"Checksum: " \'{print $2}\' | cut -d\')\' -f1 | awk \'{print "\x27" $1 "\x27,"}\') \'\')"` -eq `grep Changeset /usr/share/doc/abiquo-server/database/kinton-delta-* | awk -F"Checksum: " \'{print $2}\' | cut -d\')\' -f1 | awk \'{print "\x27" $1 "\x27,"}\' | wc -l`',
       require => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ]
     }
-    $execdep = Exec['Abiquo apply database delta']
+
+    $execdep = Exec['Abiquo apply database delta', 'Abiquo liquibase update']
   }
   else {
     exec { 'Abiquo database schema':

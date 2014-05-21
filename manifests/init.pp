@@ -41,7 +41,6 @@ class abiquo (
   $baserepo = "",
   $rollingrepo = ""
 ){
-  include concat::setup
   include abiquo::firewall
 
   yumrepo { "Abiquo-Base":
@@ -52,7 +51,8 @@ class abiquo (
       default   => $baserepo
     },
     gpgcheck      => 0,
-    http_caching  => "none"
+    http_caching  => "none",
+    notify        => Exec['yum-clean-metadata']
   }
 
   yumrepo { "Abiquo-Rolling":
@@ -64,7 +64,14 @@ class abiquo (
     },
     gpgcheck      => 0,
     http_caching  => "none",
-    require       => Yumrepo['Abiquo-Base']
+    require       => Yumrepo['Abiquo-Base'],
+    notify        => Exec['yum-clean-metadata']
+  }
+
+  exec { 'yum-clean-metadata':
+    path        => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+    command     => "yum clean all",
+    refreshonly => true
   }
 
   class { 'selinux': 
@@ -83,10 +90,18 @@ class abiquo (
     ip      => $::ipaddress,
   }
 
+  file { [ '/opt/abiquo', '/opt/abiquo/config' ]:
+    ensure  => directory,
+    owner   => 'root',
+    mode    => '0755',
+    before  =>  Yumrepo['Abiquo-Base']
+  } 
+
   concat { '/opt/abiquo/config/abiquo.properties':
     owner   => 'root',
     mode    => '0755',
-    notify  => Service['abiquo-tomcat']
+    notify  => Service['abiquo-tomcat'],
+    require => File['/opt/abiquo/config']
   }
 
   abiproperties::register { 'properties header':
