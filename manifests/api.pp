@@ -58,6 +58,14 @@ class abiquo::api (
     action => accept,
   }
 
+  if $proxy {
+    firewall { '100 allow proxy connector access':
+      port   => 8011,
+      proto  => tcp,
+      action => accept,
+    }    
+  }
+
   abiproperties::register { 'Server properties for API':
     content => "[server]\n",
     order   => '05',
