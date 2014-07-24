@@ -1,5 +1,7 @@
 class abiquo::api (
   $secure         = true,
+  $proxy          = false,
+  $proxyhost      = ''
 ) {
   include abiquo::jdk
   include abiquo::redis

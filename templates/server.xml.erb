@@ -20,7 +20,6 @@
   <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
   <Listener className="org.apache.catalina.core.JasperListener" />
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
-  <!-- <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" /> -->
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
   <Listener className="com.abiquo.listeners.AbiquoConfigurationListener"/>
 
@@ -48,6 +47,22 @@
                secure="<%= @secure %>"
                />
 
+  <% if @proxy %>
+    <Connector port="8011" protocol="HTTP/1.1"
+               enableLookups="false"
+               tomcatAuthentication="false"
+               connectionTimeout="20000"
+               secure="<%= @secure %>"
+               proxyName="<%= @proxyhost %>"
+            <% if @secure %>
+               proxyPort="443"
+               scheme="https"
+            <% else %>
+               proxyPort="80"
+               scheme="http"
+            <% end %>
+               />
+  <% end %>
 
     <Engine name="Catalina" defaultHost="localhost">
 
