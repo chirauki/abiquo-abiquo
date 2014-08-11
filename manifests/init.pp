@@ -37,7 +37,7 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version = "3.0",
+  $abiquo_version = "3.1",
   $baserepo = "",
   $rollingrepo = ""
 ){
@@ -59,7 +59,7 @@ class abiquo (
     name          => "abiquo-rolling",
     descr         => "abiquo-rolling-${abiquo_version}",
     baseurl       => $rollingrepo ? {
-      ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
+      ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/updates/x86_64/",
       default   => $rollingrepo
     },
     gpgcheck      => 0,

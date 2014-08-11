@@ -7,9 +7,27 @@ Abiquo components will be selected by assigning specific classes to a node's man
 Depends on:
 
  - [puppetlabs/apache](https://forge.puppetlabs.com/puppetlabs/apache)
+ - [puppetlabs/concat](https://forge.puppetlabs.com/puppetlabs/concat)
  - [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
  - [puppetlabs/firewall](https://forge.puppetlabs.com/puppetlabs/firewall)
  - [spiette/selinux](https://forge.puppetlabs.com/spiette/selinux)
+
+#3.1 Notice on JCE
+
+Since version 3.1, Abiquo uses [Oracle's Java Cryptography Extensions](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html) to enctypt stored credentials. Since we cannot redistribute them, you need to manually download them and put jar files in ```files/jce``` directory. Resulting tree should look like:
+
+```
+abiquo
+  |
+  |-- files
+  |     |-- jce
+  |          |-- local_policy.jar
+  |          |-- US_export_policy.jar
+  |-- lib
+  ...
+```
+
+Missing those files will result on failed puppet run even if you are installing Abiquo < 3.1.
 
 #Available components
 
@@ -19,7 +37,7 @@ This is the base class. Its only purpose is to be able to define a different Abi
 
 ```
 class { 'abiquo':
-  abiquo_version => "3.0",
+  abiquo_version => "3.1",
   baserepo = "http://myrepo/packages/",
   rollingrepo = "http://myrepo/updates/"
 }
@@ -38,14 +56,17 @@ The Abiquo API class includes the API itself and the M webapp for events and out
 
 ```
 class { 'abiquo::api':
-  secure         => true
+  secure     => true,
+  $proxy     => false,
+  $proxyhost => ''
 }
 ```
 
 ####Parameters
 
 - **secure determines** wether SSL will be set up or not.
-
+- **proxy** determines if Abiquo will be acessed thorugh a reverse proxy. Sets a tomcat connector on port 8011 for that matter.
+- **proxyhost** the reverse proxy FQDN which should be written in API reponses.
 
 ##Abiquo client
 
@@ -94,7 +115,7 @@ This class does not take parameters. You can also set any of its properties usin
 
 ##Abiquo properties
 
-The base Abiquo class provides a custom type that allows to set the values for each property defined in [Abiquo wiki](http://wiki.abiquo.com/display/ABI30/Abiquo+Configuration+Properties)
+The base Abiquo class provides a custom type that allows to set the values for each property defined in [Abiquo wiki](http://wiki.abiquo.com/display/ABI31/Abiquo+Configuration+Properties)
 
 To set a property, you must make sure it is defined before the class that will use it.
 
@@ -117,6 +138,7 @@ abiquo::property { "some.property":
 ##Monolithic install
 
 ```
+class { 'abiquo': }
 class { 'abiquo::api': }
 class { 'abiquo::client': }
 class { 'abiquo::remoteservice': }
@@ -126,6 +148,7 @@ class { 'abiquo::v2v': }
 ##Server only (API and GUI)
 
 ```
+class { 'abiquo': }
 class { 'abiquo::api': }
 class { 'abiquo::client': }
 ```
@@ -136,6 +159,7 @@ You will probably need to set the Rabbit IP address in the RS properties file:
 
 ```
 abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-services" }
+class { 'abiquo': }
 class { 'abiquo::remoteservice': }
 ```
 
@@ -147,5 +171,6 @@ Again, you will need to set some properties (Note, the module will not ensure th
 abiquo::property{ 'abiquo.appliancemanager.localRepositoryPath': value => "/opt/vm_repository/", section => "remote-services" }
 abiquo::property{ 'abiquo.appliancemanager.repositoryLocation': value => "192.168.2.50:/opt/vm_repository", section => "remote-services" }
 abiquo::property{ 'abiquo.rabbitmq.host': value => "IP_ADDRESS_OF_API_SERVER", section => "remote-services" }
+class { 'abiquo': }
 class { 'abiquo::remoteservice': rstype => 'datacenter' }
 ```
