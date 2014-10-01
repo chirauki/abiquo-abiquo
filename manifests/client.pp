@@ -72,14 +72,15 @@ class abiquo::client (
       onlyif  => "test -d /opt/abiquo/tomcat/client-premium"
     }
 
-    if $api_address == '' {
-      $api_address = $::ipaddress
+    endpoint_address = $api_address ? {
+      ''      => $::ipaddress,
+      default => $api_address,
     }
     exec { 'Set API and protocol in UI config':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => $secure ? {
-        true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${api_address}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
-        false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${api_address}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+        true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${endpoint_address}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+        false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${endpoint_address}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
       },
       require => Package['abiquo-ui']
     }
