@@ -1,9 +1,6 @@
 class abiquo::client (
   $secure         = true,
-  $api_address    = $::ec2_public_ipv4 ? {
-                      undef     => $::ipaddress,
-                      default   => $::ec2_public_ipv4
-                    }
+  $api_address    = ''
 ) {
   include abiquo::jdk
 
@@ -75,6 +72,9 @@ class abiquo::client (
       onlyif  => "test -d /opt/abiquo/tomcat/client-premium"
     }
 
+    if $api_address == '' {
+      $api_address = $::ipaddress
+    }
     exec { 'Set API and protocol in UI config':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => $secure ? {
