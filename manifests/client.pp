@@ -9,13 +9,11 @@ class abiquo::client (
     ''        => $::ipaddress,
     default   => $api_address,
   }
-  notify { "Provided api_address is \'${api_address}\' so will set \'${f_api_address}\'" }
 
   $f_api_endpoint = $api_endpoint ? {
     ''        => $::ipaddress,
     default   => $api_endpoint,
   }
-  notify { "Provided api_endpoint is \'${api_endpoint}\' so will set \'${f_api_endpoint}\'" }
 
   if versioncmp($abiquo::abiquo_version, "2.8") >= 0 {
     $uipkg = "abiquo-ui"
