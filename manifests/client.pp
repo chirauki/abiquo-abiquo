@@ -1,15 +1,16 @@
 class abiquo::client (
   $secure         = true,
-  $api_address    = ''
+  $api_address    = $::ipaddress,
+  $api_endpoint   = $::ipaddress,
 ) {
   include abiquo::jdk
 
-  if versioncmp($abiquo::abiquo_version, "2.7") <= 0 {
-    $uipkg = 'abiquo-client-premium'
+  if versioncmp($abiquo::abiquo_version, "2.8") >= 0 {
+    $uipkg = "abiquo-ui"
   }
   else {
-    notify { "Abiquo version ${abiquo::abiquo_version} does not use flex client. Selecting abiquo-ui instead.": }
-    $uipkg = "abiquo-ui"
+    $uipkg = 'abiquo-client-premium'
+    notify { "Abiquo version ${abiquo::abiquo_version} does not use HTML client. Selecting abiquo-client-premium instead.": }
   }
 
   if $uipkg == "abiquo-ui" {
@@ -31,8 +32,8 @@ class abiquo::client (
     class { 'apache::mod::proxy_ajp': }
 
     $proxy_pass = [
-      { 'path' => '/api', 'url' => 'ajp://localhost:8010/api' },
-      { 'path' => '/legal', 'url' => 'ajp://localhost:8010/legal' },
+      { 'path' => '/api', 'url' => "ajp://${api_address}:8010/api" },
+      { 'path' => '/legal', 'url' => "ajp://${api_address}:8010/api" },
     ]
 
     if $secure == true {
@@ -72,7 +73,7 @@ class abiquo::client (
       onlyif  => "test -d /opt/abiquo/tomcat/client-premium"
     }
 
-    endpoint_address = $api_address ? {
+    $endpoint_address = $api_address ? {
       ''      => $::ipaddress,
       default => $api_address,
     }
