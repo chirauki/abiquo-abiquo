@@ -1,9 +1,21 @@
 class abiquo::client (
   $secure         = true,
-  $api_address    = $::ipaddress,
-  $api_endpoint   = $::ipaddress,
+  $api_address    = '',
+  $api_endpoint   = '',
 ) {
   include abiquo::jdk
+
+  $f_api_address = $api_address ? {
+    ''        => $::ipaddress,
+    default   => $api_address,
+  }
+  notify { "Provided api_address is \'${api_address}\' so will set \'${f_api_address}\'" }
+
+  $f_api_endpoint = $api_endpoint ? {
+    ''        => $::ipaddress,
+    default   => $api_endpoint,
+  }
+  notify { "Provided api_endpoint is \'${api_endpoint}\' so will set \'${f_api_endpoint}\'" }
 
   if versioncmp($abiquo::abiquo_version, "2.8") >= 0 {
     $uipkg = "abiquo-ui"
@@ -32,8 +44,8 @@ class abiquo::client (
     class { 'apache::mod::proxy_ajp': }
 
     $proxy_pass = [
-      { 'path' => '/api', 'url' => "ajp://${api_address}:8010/api" },
-      { 'path' => '/legal', 'url' => "ajp://${api_address}:8010/api" },
+      { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
+      { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/api" },
     ]
 
     if $secure == true {
@@ -76,8 +88,8 @@ class abiquo::client (
     exec { 'Set API and protocol in UI config':
       path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command => $secure ? {
-        true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
-        false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+        true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+        false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
       },
       require => Package['abiquo-ui']
     }
