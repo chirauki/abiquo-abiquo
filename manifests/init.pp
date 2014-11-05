@@ -37,7 +37,7 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version = "3.1",
+  $abiquo_version = "3.2",
   $baserepo = "",
   $rollingrepo = ""
 ){
