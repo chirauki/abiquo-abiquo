@@ -4,8 +4,7 @@ class abiquo::jdk {
     require => Yumrepo['Abiquo-Base']
   }
 
-  $java_ver = "8"
-  if versioncmp($abiquo::abiquo_version, "3.2") >=0 {
+  if versioncmp($abiquo::abiquo_version, "3.2") >= 0 {
     $java_ver = "8"
   }
   else {
