@@ -43,7 +43,7 @@ class abiquo::client (
 
     $proxy_pass = [
       { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
-      { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/api" },
+      { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
     ]
 
     if $secure == true {
