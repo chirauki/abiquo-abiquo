@@ -41,10 +41,19 @@ class abiquo::client (
     class { 'apache::mod::proxy': }
     class { 'apache::mod::proxy_ajp': }
 
-    $proxy_pass = [
-      { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
-      { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
-    ]
+    if $secure == true {
+      $proxy_pass = [
+        { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
+        { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
+        { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am" },
+      ]
+    }
+    else {
+      $proxy_pass = [
+        { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
+        { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
+      ]
+    }
 
     if $secure == true {
       apache::vhost { 'abiquo-ssl':
