@@ -46,15 +46,17 @@ This is the base class. Its only purpose is to be able to define a different Abi
 
 ```
 class { 'abiquo':
-  abiquo_version => "3.1",
-  baserepo = "http://myrepo/packages/",
-  rollingrepo = "http://myrepo/updates/"
+  abiquo_version    => "3.2",
+  upgrade_packages  => false,
+  baserepo          => "http://myrepo/packages/",
+  rollingrepo       => "http://myrepo/updates/"
 }
 ```
 
 ####Parameters
 
 - **abiquo_version** a string denoting a major version of Abiquo (ie. 2.4, 2.6, etc. Not 2.4.1, 2.4.2, etc.).
+- **upgrade_packages** boolean determinig wether or not abiquo packages will be updated or not.
 - **baserepo** a URL if you want to use a custom yum repo for base packages.
 - **rollingrepo** a URL if you want to use a custom yum repo for development version of RPM packages.
 
@@ -83,15 +85,17 @@ Client class installs the flex client app for 2.6 or the ui webapp for 2.8+
 
 ```
 class { 'abiquo::client': 
-  secure         => true,
-  api_address    => $::ipaddress
+  secure        => true,
+  api_address   => $::ipaddress,
+  api_endpoint  => $::ipaddress
 }
 ```
 
 ####Parameters
 
 - **secure determines** wether SSL will be set up or not in Apache server hosting the UI webapp (2.8+).
-- **api_address** is the IP address to set as ```config.endpoint``` in UI's config file (2.8+).
+- **api_address** is the IP address set as Apache proxy destination.
+- **api_endpoint** is the IP address to set as ```config.endpoint``` in UI's config file (2.8+).
 
 
 ##Abiquo remote services
