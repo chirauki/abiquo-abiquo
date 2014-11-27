@@ -1,6 +1,6 @@
 class abiquo::jdk {
   package { "jdk":
-    ensure  => $upgrade_packages ? {
+    ensure  => $abiquo::upgrade_packages ? {
       true  => latest,
       false => present,
     },

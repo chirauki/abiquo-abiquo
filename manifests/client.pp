@@ -25,7 +25,7 @@ class abiquo::client (
 
   if $uipkg == "abiquo-ui" {
     package { 'abiquo-ui':
-      ensure  =>$upgrade_packages ? {
+      ensure  => $abiquo::upgrade_packages ? {
       true  => latest,
       false => present,
     },
@@ -106,7 +106,7 @@ class abiquo::client (
   }
   else {
     package { 'client-premium':
-      ensure  => $upgrade_packages ? {
+      ensure  => $abiquo::upgrade_packages ? {
         true  => latest,
         false => present,
       },

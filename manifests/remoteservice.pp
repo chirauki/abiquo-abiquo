@@ -20,7 +20,7 @@ class abiquo::remoteservice (
   }
 
   package { $rspackages:
-    ensure  => $upgrade_packages ? {
+    ensure  => $abiquo::upgrade_packages ? {
       true  => latest,
       false => present,
     },

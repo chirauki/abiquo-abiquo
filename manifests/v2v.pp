@@ -4,7 +4,7 @@ class abiquo::v2v {
   include abiquo::tomcat
 
   package { "abiquo-v2v":
-    ensure  => $upgrade_packages ? {
+    ensure  => $abiquo::upgrade_packages ? {
       true  => latest,
       false => present,
     },
