@@ -1,6 +1,9 @@
 class abiquo::jdk {
   package { "jdk":
-    ensure  => latest,
+    ensure  => $upgrade_packages ? {
+      true  => latest,
+      false => present,
+    },
     require => Yumrepo['Abiquo-Base']
   }
 

@@ -4,7 +4,10 @@ class abiquo::v2v {
   include abiquo::tomcat
 
   package { "abiquo-v2v":
-    ensure  => latest,
+    ensure  => $upgrade_packages ? {
+      true  => latest,
+      false => present,
+    },
     require => Yumrepo['Abiquo-Rolling'],
     notify  => Service['abiquo-tomcat']
   }

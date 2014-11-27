@@ -18,7 +18,7 @@ class abiquo::api (
   }
 
   package { $apipkgs:
-    ensure  => $::upgrade_packages ? {
+    ensure  => $upgrade_packages ? {
       true  => latest,
       false => present,
     },
