@@ -37,9 +37,10 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version = "3.2",
-  $baserepo = "",
-  $rollingrepo = ""
+  $abiquo_version   = "3.2",
+  $upgrade_packages = false,
+  $baserepo         = "",
+  $rollingrepo      = ""
 ){
   include abiquo::firewall
 

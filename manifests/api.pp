@@ -18,7 +18,10 @@ class abiquo::api (
   }
 
   package { $apipkgs:
-    ensure  => latest,
+    ensure  => $::upgrade_packages ? {
+      true  => latest,
+      false => present,
+    },
     require => [ Yumrepo['Abiquo-Rolling'], Exec['Stop Abiquo tomcat before upgrade.'], Package['MariaDB-server', 'redis', 'jdk']] ,
     notify  => Service['abiquo-tomcat']
   }

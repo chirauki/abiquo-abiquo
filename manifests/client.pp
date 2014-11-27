@@ -25,7 +25,10 @@ class abiquo::client (
 
   if $uipkg == "abiquo-ui" {
     package { 'abiquo-ui':
-      ensure  => latest,
+      ensure  => $::upgrade_packages ? {
+        true  => latest,
+        false => present,
+      },
       require => [ Yumrepo['Abiquo-Rolling'], Package['jdk'] ],
       notify  => Service['abiquo-tomcat'],
     }
@@ -103,7 +106,10 @@ class abiquo::client (
   }
   else {
     package { 'client-premium':
-      ensure  => latest,
+        ensure  => $::upgrade_packages ? {
+        true  => latest,
+        false => present,
+      },
       require => [ Yumrepo['Abiquo-Rolling'], Package['jdk'] ],
       notify  => Service['abiquo-tomcat']
     }

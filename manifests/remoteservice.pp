@@ -20,7 +20,10 @@ class abiquo::remoteservice (
   }
 
   package { $rspackages:
-    ensure  => latest,
+    ensure  => $::upgrade_packages ? {
+      true  => latest,
+      false => present,
+    },
     require => [ Yumrepo['Abiquo-Rolling'], Package['redis'] ],
     notify  => Service['abiquo-tomcat']
   }
