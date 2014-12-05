@@ -101,6 +101,7 @@ class abiquo::client (
         true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
         false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
       },
+      unless  => "grep ${f_api_endpoint} /var/www/html/ui/config/client-config.json",
       require => Package['abiquo-ui']
     }
   }

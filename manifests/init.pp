@@ -39,6 +39,7 @@
 class abiquo (
   $abiquo_version   = "3.2",
   $upgrade_packages = false,
+  $gpgcheck         = true,
   $baserepo         = "",
   $rollingrepo      = ""
 ){
@@ -51,7 +52,10 @@ class abiquo (
       ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
       default   => $baserepo
     },
-    gpgcheck      => 0,
+    gpgcheck      => $gpgcheck ? {
+      true  => 1,
+      false => 0,
+    },
     http_caching  => "none",
     notify        => Exec['yum-clean-metadata']
   }
@@ -63,7 +67,10 @@ class abiquo (
       ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/updates/x86_64/",
       default   => $rollingrepo
     },
-    gpgcheck      => 0,
+    gpgcheck      => $gpgcheck ? {
+      true  => 1,
+      false => 0,
+    },
     http_caching  => "none",
     require       => Yumrepo['Abiquo-Base'],
     notify        => Exec['yum-clean-metadata']
@@ -141,6 +148,21 @@ class abiquo (
     abiproperties::register { "property_$realname":
       content => "$realname = $value\n",
       order   => "$offset",
+    }
+
+    if $realname == "abiquo.appliancemanager.repositoryLocation" {
+      file { "/opt/vm_repository":
+        ensure => 'directory'
+      }
+
+      mount { "/opt/vm_repository":
+        device  => "$value",
+        fstype  => "nfs",
+        ensure  => "mounted",
+        options => "defaults",
+        atboot  => true,
+        require => File['/opt/vm_repository'],
+      }
     }
   }
 }

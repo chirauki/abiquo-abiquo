@@ -1,21 +1,24 @@
 class abiquo::remoteservice (
-  $rstype         = "publiccloud"
+  $rstype         = "publiccloud",
+  $install_redis  = true,
 ) {
   include abiquo::jdk
-  include abiquo::redis
   include abiquo::firewall
   include abiquo::tomcat
   
+  if $install_redis == true { include abiquo::redis }
+
   if versioncmp($abiquo::abiquo_version, "2.7") <= 0 {
     $rspackages = $rstype ? {
       publiccloud  => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector" ],
-      datacenter   => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-ssm", "abiquo-am", "ipmitool"]
+      datacenter   => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-ssm", "abiquo-am", "ipmitool"],
     }
   }
   else {
     $rspackages = $rstype ? {
       publiccloud => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-cpp"],
-      datacenter  => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-ssm", "abiquo-am", "ipmitool"]
+      datacenter  => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-ssm", "abiquo-am", "ipmitool"],
+      full        => ["abiquo-vsm", "abiquo-virtualfactory", "abiquo-nodecollector", "abiquo-cpp", "abiquo-ssm", "abiquo-am", "ipmitool"],
     }
   }
 
@@ -24,7 +27,7 @@ class abiquo::remoteservice (
       true  => latest,
       false => present,
     },
-    require => [ Yumrepo['Abiquo-Rolling'], Package['redis'] ],
+    require => Yumrepo['Abiquo-Rolling'],
     notify  => Service['abiquo-tomcat']
   }
   

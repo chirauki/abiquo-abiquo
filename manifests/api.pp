@@ -1,13 +1,60 @@
 class abiquo::api (
   $secure         = true,
   $proxy          = false,
-  $proxyhost      = ''
+  $proxyhost      = '',
+  $install_db     = true,
+  $install_rabbit = true,
+  $install_redis  = true,
+  $db_url         = '',
+  $db_user        = 'root',
+  $db_pass        = ''
 ) {
   include abiquo::jdk
-  include abiquo::redis
-  include abiquo::rabbit
-  include abiquo::mariadb
   include abiquo::tomcat
+
+  if $install_redis == true { include abiquo::redis }
+  if $install_rabbit == true { include abiquo::rabbit }
+  
+  if $db_url == '' {
+    if $install_db == true {
+      include abiquo::mariadb
+    }
+    else {
+      notify { 'ERROR. Will not install DB and no db_url provided.': }
+    }
+  }
+  else {
+    exec { 'set db url':
+      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      cwd     => '/opt/abiquo/tomcat/conf/Catalina/localhost/',
+      command => "sed -i 's/mysql:\\/\\/.*\\/kinton/mysql:\\/\\/${db_url}\\/kinton/g' api.xml m.xml",
+      unless  => "grep ${db_url} api.xml && grep ${db_url} m.xml",
+      require => Package['abiquo-server'],
+      notify  => Service['abiquo-tomcat']
+    }
+
+    exec { 'set db user':
+      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      cwd     => '/opt/abiquo/tomcat/conf/Catalina/localhost/',
+      command => "sed -i 's/username=\"\\([^\"]*\\)\"/username=\"${db_user}\"/g\' api.xml m.xml",
+      unless  => "grep ${db_user} api.xml && grep ${db_user} m.xml",
+      require => Package['abiquo-server'],
+      notify  => Service['abiquo-tomcat']
+    }
+
+    exec { 'set db pass':
+      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      cwd     => '/opt/abiquo/tomcat/conf/Catalina/localhost/',
+      command => "sed -i 's/password=\"\\([^\"]*\\)\"/password=\"${db_pass}\"/g\' api.xml m.xml",
+      unless  => "grep ${db_pass} api.xml && grep ${db_pass} m.xml",
+      require => Package['abiquo-server'],
+      notify  => Service['abiquo-tomcat']
+    }
+
+    abiquo::property { "abiquo.database.user": value => "${db_user}", section => "server" }
+    abiquo::property { "abiquo.database.password": value => "${db_pass}", section => "server" }
+    abiquo::property { "abiquo.database.host": value => "${db_url}", section => "server" }
+  }
   
   $apipkgs = ["abiquo-api", "abiquo-server", "abiquo-core", "abiquo-m"]
 
@@ -22,28 +69,28 @@ class abiquo::api (
       true  => latest,
       false => present,
     },
-    require => [ Yumrepo['Abiquo-Rolling'], Exec['Stop Abiquo tomcat before upgrade.'], Package['MariaDB-server', 'redis', 'jdk']] ,
-    notify  => Service['abiquo-tomcat']
+    require => [ Yumrepo['Abiquo-Rolling'], Exec['Stop Abiquo tomcat before upgrade.'], Package['jdk'] ] ,
+    notify  => [ Service['abiquo-tomcat'], Exec ['Abiquo liquibase update', 'Abiquo apply database delta'] ],
   }
 
   if $::kinton_present == 1 {
     #notify { "Abiquo liquibase update present. Running.": }
     exec { 'Abiquo liquibase update':
-      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
-      command => '/usr/bin/abiquo-liquibase-update',
-      onlyif  => '/usr/bin/which abiquo-liquibase-update',
-      require => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ]
+      path        => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      command     => '/usr/bin/abiquo-liquibase-update',
+      onlyif      => '/usr/bin/which abiquo-liquibase-update',
+      require     => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ],
+      refreshonly => true,
     }
 
     #notify { "Applying Abiquo delta.": }
     exec { 'Abiquo apply database delta':
-      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
-      command => 'mysql kinton < `ls /usr/share/doc/abiquo-server/database/kinton-delta-*.sql`',
-      unless  => 'test `mysql kinton -B --skip-column-names -e "select count(*) from DATABASECHANGELOG where MD5SUM in ($(grep Changeset /usr/share/doc/abiquo-server/database/kinton-delta-* | awk -F"Checksum: " \'{print $2}\' | cut -d\')\' -f1 | awk \'{print "\x27" $1 "\x27,"}\') \'\')"` -eq `grep Changeset /usr/share/doc/abiquo-server/database/kinton-delta-* | awk -F"Checksum: " \'{print $2}\' | cut -d\')\' -f1 | awk \'{print "\x27" $1 "\x27,"}\' | wc -l`',
-      require => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ]
+      path        => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      command     => 'mysql kinton < `ls /usr/share/doc/abiquo-server/database/kinton-delta-*.sql`',
+      unless      => 'test `mysql kinton -B --skip-column-names -e "select count(*) from DATABASECHANGELOG where MD5SUM in ($(grep Changeset /usr/share/doc/abiquo-server/database/kinton-delta-* | awk -F"Checksum: " \'{print $2}\' | cut -d\')\' -f1 | awk \'{print "\x27" $1 "\x27,"}\') \'\')"` -eq `grep Changeset /usr/share/doc/abiquo-server/database/kinton-delta-* | awk -F"Checksum: " \'{print $2}\' | cut -d\')\' -f1 | awk \'{print "\x27" $1 "\x27,"}\' | wc -l`',
+      require     => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ],
+      refreshonly => true,
     }
-
-    $execdep = Exec['Abiquo apply database delta', 'Abiquo liquibase update']
   }
   else {
     exec { 'Abiquo database schema':
@@ -52,7 +99,6 @@ class abiquo::api (
       unless  => 'mysql -e "show databases" | grep kinton',
       require => Package['abiquo-server']
     }
-    $execdep = Exec['Abiquo database schema']
   }
 
   firewall { '100 allow rabbit access':

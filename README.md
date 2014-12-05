@@ -1,6 +1,6 @@
 #abiquo-abiquo
 
-You can use this module to install Abiquo components in a CentOS machine.
+You can use this module to install [Abiquo](http://www.abiquo.com) components in a CentOS machine.
 
 Abiquo components will be selected by assigning specific classes to a node's manifest.
 
@@ -48,6 +48,7 @@ This is the base class. Its only purpose is to be able to define a different Abi
 class { 'abiquo':
   abiquo_version    => "3.2",
   upgrade_packages  => false,
+  gpgcheck          => true,
   baserepo          => "http://myrepo/packages/",
   rollingrepo       => "http://myrepo/updates/"
 }
@@ -56,7 +57,8 @@ class { 'abiquo':
 ####Parameters
 
 - **abiquo_version** a string denoting a major version of Abiquo (ie. 2.4, 2.6, etc. Not 2.4.1, 2.4.2, etc.).
-- **upgrade_packages** boolean determinig wether or not abiquo packages will be updated or not.
+- **upgrade_packages** boolean determinig wether or not Abiquo packages will be updated or not.
+- **gpgcheck** boolean determinig wether or not Abiquo yum repositories will validate GPG signatures on packages.
 - **baserepo** a URL if you want to use a custom yum repo for base packages.
 - **rollingrepo** a URL if you want to use a custom yum repo for development version of RPM packages.
 
@@ -67,9 +69,15 @@ The Abiquo API class includes the API itself and the M webapp for events and out
 
 ```
 class { 'abiquo::api':
-  secure     => true,
-  $proxy     => false,
-  $proxyhost => ''
+  secure          => true,
+  proxy           => false,
+  proxyhost       => '',
+  install_db      => true,
+  install_rabbit  => true,
+  install_redis   => true,
+  db_url          => '',
+  db_user         => 'root',
+  db_pass         => ''
 }
 ```
 
@@ -78,6 +86,12 @@ class { 'abiquo::api':
 - **secure determines** wether SSL will be set up or not.
 - **proxy** determines if Abiquo will be acessed thorugh a reverse proxy. Sets a tomcat connector on port 8011 for that matter.
 - **proxyhost** the reverse proxy FQDN which should be written in API reponses.
+- **install_db** boolean that determines if the MariaDB or MySQL server will be installed.
+- **install_rabbit** boolean that determines if the RabbitMQ server will be installed.
+- **install_redis** boolean that determines if the Redis server will be installed.
+- **db_url** If not using local database, specifies the IP and port of the MySQL server in the form ```IP:PORT```. If this parameter has a value, local database will not be installed.
+- **db_user** The user used to connect to the MariaDB server.
+- **db_pass** The password for the aforementioned user.
 
 ##Abiquo client
 
@@ -104,13 +118,15 @@ This class installs and configures all the remote services needed to run a datac
 
 ```
 class { 'abiquo::remoteservice':
-  rstype  => 'publiccloud'
+  rstype        => 'publiccloud',
+  install_redis => true,
 }
 ```
 
 ####Parameters
 
-- **rstype** determines the type of RS that will be setup. It can be ```datacenter``` or ```publiccloud```.
+- **rstype** determines the type of RS that will be setup. It can be ```datacenter```, ```publiccloud``` or ```full``` (```full``` will install all webapps for both the ```datacenter``` and ```publiccloud``` options).
+- **install_redis** boolean that determines if the Redis server will be installed.
 
 
 ##Abiquo V2V
@@ -128,7 +144,7 @@ This class does not take parameters. You can also set any of its properties usin
 
 ##Abiquo properties
 
-The base Abiquo class provides a custom type that allows to set the values for each property defined in [Abiquo wiki](http://wiki.abiquo.com/display/ABI31/Abiquo+Configuration+Properties)
+The base Abiquo class provides a custom type that allows to set the values for each property defined in [Abiquo wiki](http://wiki.abiquo.com/display/ABI32/Abiquo+Configuration+Properties)
 
 To set a property, you must make sure it is defined before the class that will use it.
 
@@ -145,6 +161,7 @@ abiquo::property { "some.property":
 - **value** is the value of the property you want to set.
 - **section** is the section in the properties file where the property should be. It can be either ```server``` or ```remote-services```
 
+**Note** Specifying the property ```abiquo.appliancemanager.repositoryLocation``` will automatically setup the mount of the repository. For more information check [Abiquo wiki](http://wiki.abiquo.com/display/ABI32/Abiquo+Configuration+Properties)
 
 #Examples
 
