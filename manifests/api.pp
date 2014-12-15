@@ -9,6 +9,8 @@ class abiquo::api (
   $db_user        = 'root',
   $db_pass        = ''
 ) {
+  include abiquo::config
+  include abiquo::firewall
   include abiquo::jdk
   include abiquo::tomcat
 
@@ -64,15 +66,6 @@ class abiquo::api (
     unless  => 'ps -ef | grep java | grep /opt/abiquo/tomcat',
   }
 
-  package { $apipkgs:
-    ensure  => $abiquo::upgrade_packages ? {
-      true  => latest,
-      false => present,
-    },
-    require => [ Yumrepo['Abiquo-Rolling'], Exec['Stop Abiquo tomcat before upgrade.'], Package['jdk'] ] ,
-    notify  => [ Service['abiquo-tomcat'], Exec ['Abiquo liquibase update', 'Abiquo apply database delta'] ],
-  }
-
   if $::kinton_present == 1 {
     #notify { "Abiquo liquibase update present. Running.": }
     exec { 'Abiquo liquibase update':
@@ -91,6 +84,8 @@ class abiquo::api (
       require     => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ],
       refreshonly => true,
     }
+
+    $pkgnotify = [ Service['abiquo-tomcat'], Exec['Abiquo liquibase update', 'Abiquo apply database delta'] ]
   }
   else {
     exec { 'Abiquo database schema':
@@ -99,6 +94,17 @@ class abiquo::api (
       unless  => 'mysql -e "show databases" | grep kinton',
       require => Package['abiquo-server']
     }
+
+    $pkgnotify = [ Service['abiquo-tomcat'], Exec['Abiquo database schema'] ]
+  }
+
+  package { $apipkgs:
+    ensure  => $abiquo::upgrade_packages ? {
+      true  => latest,
+      false => present,
+    },
+    require => [ Yumrepo['Abiquo-Rolling'], Exec['Stop Abiquo tomcat before upgrade.'], Package['jdk'] ] ,
+    notify  => $pkgnotify,
   }
 
   firewall { '100 allow rabbit access':

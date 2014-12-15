@@ -4,7 +4,8 @@ class abiquo::client (
   $api_endpoint   = '',
 ) {
   include abiquo::jdk
-
+  include abiquo::firewall
+  
   $f_api_address = $api_address ? {
     ''        => $::ipaddress,
     default   => $api_address,

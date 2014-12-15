@@ -1,0 +1,24 @@
+#
+# This file is currently managed by puppet.
+# Any edit will be overwritten by puppet runs.
+#
+# AIM configuration file
+
+[server]
+port = <%= @aim_port %>
+
+[monitor]
+uri = "qemu+unix:///system"
+<% if @redis_host != "" %>redisHost = <%= @redis_host %><% end %>
+<% if @redis_port != "0" %>redisPort = <%= @redis_port %><% end %>
+
+[rimp]
+repository = <%= @aim_repository %>
+datastore = <%= @aim_datastore %>
+<% if @autobackup %>autoBackup = true<% end %>
+<% if @autorestore %>autoRestore = true<% end %>
+
+[vlan]
+ifconfigCmd = /sbin/ifconfig
+vconfigCmd = /sbin/vconfig
+brctlCmd = /usr/sbin/brctl

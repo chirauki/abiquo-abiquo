@@ -142,6 +142,46 @@ class { 'abiquo::v2v': }
 This class does not take parameters. You can also set any of its properties using the property resource.
 
 
+##Abiquo KVM
+
+Sets up the KVM cloud node.
+
+```
+class { 'abiquo::kvm': 
+  redis_host     => '192.168.2.2',
+  redis_port     => 6379,
+  aim_port       => 8889,
+  aim_repository => '/opt/vm_repository',
+  aim_datastore  => '/var/lib/virt',
+  autobackup     => false,
+  autorestore    => false,
+}
+```
+
+####Parameters
+
+- **redis_host** Address of the Redis server where to report events (Pre 3.x).
+- **redis_port** Port of the Redis server where to report events (Pre 3.x).
+- **aim_port** TCP port to where the AIM server will be listening. Defaults to ```8889```.
+- **aim_repository** Directory where the VM repository is mounted. Defaults to ```/opt/vm_repository```.
+- **aim_datastore** Datastore directory. Defaults to ```/var/lib/virt```.
+- **autobackup** boolean that determines if the undeployed VMs will be backed up. Defaults to ```false```.
+- **autorestore** boolean that determines if the deployed VMs will be restored from backup. Defaults to ```false```.
+
+
+##Zookeeper
+
+Installs the Zookeeper server used to synchronize distributed APIs.
+
+```
+class { 'abiquo::zookeeper': }
+```
+
+####Parameters
+
+This class does not take parameters. You can also set any of its properties using the property resource.
+
+
 ##Abiquo properties
 
 The base Abiquo class provides a custom type that allows to set the values for each property defined in [Abiquo wiki](http://wiki.abiquo.com/display/ABI32/Abiquo+Configuration+Properties)

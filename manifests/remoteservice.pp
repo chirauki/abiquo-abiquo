@@ -2,6 +2,7 @@ class abiquo::remoteservice (
   $rstype         = "publiccloud",
   $install_redis  = true,
 ) {
+  include abiquo::config
   include abiquo::jdk
   include abiquo::firewall
   include abiquo::tomcat

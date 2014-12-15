@@ -43,8 +43,6 @@ class abiquo (
   $baserepo         = "",
   $rollingrepo      = ""
 ){
-  include abiquo::firewall
-
   yumrepo { "Abiquo-Base":
     name          => "abiquo-base",
     descr         => "abiquo-base-${abiquo_version}",
@@ -86,35 +84,10 @@ class abiquo (
     mode => 'disabled'
   }
 
-  firewall { '100 allow Tomcat access':
-    port   => 8009,
-    proto  => tcp,
-    action => accept,
-  }
-
   host { 'Add hostname to /etc/hosts':
     ensure  => present,
     name    => $::hostname,
     ip      => $::ipaddress,
-  }
-
-  file { [ '/opt/abiquo', '/opt/abiquo/config' ]:
-    ensure  => directory,
-    owner   => 'root',
-    mode    => '0755',
-    before  =>  Yumrepo['Abiquo-Base']
-  } 
-
-  concat { '/opt/abiquo/config/abiquo.properties':
-    owner   => 'root',
-    mode    => '0755',
-    notify  => Service['abiquo-tomcat'],
-    require => File['/opt/abiquo/config']
-  }
-
-  abiproperties::register { 'properties header':
-    content => template('abiquo/properties.header.erb'),
-    order   => '01'
   }
 
   # used by other modules to register themselves in the motd
