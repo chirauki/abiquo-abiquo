@@ -43,6 +43,8 @@ class abiquo (
   $baserepo         = "",
   $rollingrepo      = ""
 ){
+  include abiquo::ntp 
+  
   yumrepo { "Abiquo-Base":
     name          => "abiquo-base",
     descr         => "abiquo-base-${abiquo_version}",

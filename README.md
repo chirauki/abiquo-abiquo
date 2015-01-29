@@ -169,6 +169,19 @@ class { 'abiquo::kvm':
 - **autorestore** boolean that determines if the deployed VMs will be restored from backup. Defaults to ```false```.
 
 
+##Monitoring
+
+Installs Cassandra 2.0 and KairosDB to be used as metrics backend for Abiquo.
+
+```
+class { 'abiquo::monitoring': }
+```
+
+####Parameters
+
+This class does not take parameters.
+
+
 ##Zookeeper
 
 Installs the Zookeeper server used to synchronize distributed APIs.

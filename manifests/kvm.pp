@@ -7,6 +7,8 @@ class abiquo::kvm (
   $autobackup     = false,
   $autorestore    = false,
 ){
+  include abiquo::ntp
+  
   $pkgs = [ 'abiquo-aim', 'libvirt', 'qemu-kvm' ]
 
   package { $pkgs:
