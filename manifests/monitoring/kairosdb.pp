@@ -14,9 +14,11 @@ class abiquo::monitoring::kairosdb {
   }
 
   service { 'kairosdb':
-    ensure  => 'running',
-    enable  => true,
-    require => Package['kairosdb']
+    ensure    => 'running',
+    enable    => true,
+    hasstatus => false,
+    pattern   => "java.*org.kairosdb.core.Main*"
+    require   => Package['kairosdb']
   }
 
   file { '/opt/kairosdb/conf/kairosdb.properties':

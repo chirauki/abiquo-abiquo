@@ -100,6 +100,7 @@ Client class installs the flex client app for 2.6 or the ui webapp for 2.8+
 ```
 class { 'abiquo::client': 
   secure        => true,
+  ui_custom     => {}
   api_address   => $::ipaddress,
   api_endpoint  => $::ipaddress
 }
@@ -108,8 +109,9 @@ class { 'abiquo::client':
 ####Parameters
 
 - **secure determines** wether SSL will be set up or not in Apache server hosting the UI webapp (2.8+).
-- **api_address** is the IP address set as Apache proxy destination.
-- **api_endpoint** is the IP address to set as ```config.endpoint``` in UI's config file (2.8+).
+- **ui_custom** From Abiquo 3.4, this hash will be set as the custom client config file.
+- **api_address** is the IP address set as Apache proxy destination for Abiquo 3.2 or earlier.
+- **api_endpoint** is the IP address to set as ```config.endpoint``` in UI's config file for Abiquo 3.2 or earlier.
 
 
 ##Abiquo remote services

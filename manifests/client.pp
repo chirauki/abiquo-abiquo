@@ -1,5 +1,6 @@
 class abiquo::client (
   $secure         = true,
+  $ui_custom      = {},
   $api_address    = '',
   $api_endpoint   = '',
 ) {
@@ -65,7 +66,7 @@ class abiquo::client (
         docroot         => '/var/www/html',
         ssl             => true,
         proxy_pass      => $proxy_pass,
-        directories     => [ { path => '/var/www/html/ui', 'options' => 'MultiViews', 'allowoverride' => 'None', 'order' => 'allow,deny', 'allow' => 'from all', 'directoryindex' => 'index.html' } ],
+        directories     => [ { path => '/var/www/html/ui', 'options' => 'MultiViews FollowSymLinks', 'allowoverride' => 'None', 'order' => 'allow,deny', 'allow' => 'from all', 'directoryindex' => 'index.html' } ],
         rewrites        => [ { rewrite_rule => ['^/$ /ui/ [R]'] } ],
         require         => Package['abiquo-ui']
       }
@@ -96,14 +97,29 @@ class abiquo::client (
       onlyif  => "test -d /opt/abiquo/tomcat/client-premium"
     }
 
-    exec { 'Set API and protocol in UI config':
-      path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
-      command => $secure ? {
-        true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
-        false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
-      },
-      unless  => "grep ${f_api_endpoint} /var/www/html/ui/config/client-config.json",
-      require => Package['abiquo-ui']
+    if versioncmp($abiquo::abiquo_version, "3.4") >= 0 {
+      # Set API location in client-config-custom.json
+      file { '/var/www/html/ui/config/client-config-custom.json':
+        ensure => present,
+        owner     => 'root',
+        group     => 'root',
+        mode      => '0644',
+        content   => hash2json($ui_custom),
+        notify    => Service['httpd'],
+        require   => Package['abiquo-ui']
+      }
+    }
+    else {
+      # Set API location in client-config.json
+      exec { 'Set API and protocol in UI config':
+        path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+        command => $secure ? {
+          true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+          false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
+        },
+        unless  => "grep ${f_api_endpoint} /var/www/html/ui/config/client-config.json",
+        require => Package['abiquo-ui']
+      }
     }
   }
   else {
