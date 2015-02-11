@@ -1,12 +1,20 @@
 {
   "name": "abiquo-abiquo",
   "version": "0.1.0",
-  "source": "UNKNOWN",
+  "source": "git@github.com:chirauki/abiquo-abiquo.git",
   "author": "abiquo",
   "license": "Apache License, Version 2.0",
-  "summary": "UNKNOWN",
-  "description": "UNKNOWN",
-  "project_page": "UNKNOWN",
+  "summary": "Abiquo puppet module",
+  "description": "Allows to setup basic Abiquo components",
+  "project_page": "https://github.com/chirauki/abiquo-abiquo", 
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "6",
+      ]
+    }
+  ],
   "dependencies": [
     {
       "name": "puppetlabs/apache",
@@ -21,8 +29,8 @@
       "version_requirement": ">= 1.0.0"
     },
     {
-      "name": "spiette/selinux",
-      "version_requirement": ">= 0.5.4"
+      "name": "jfryman/selinux",
+      "version_requirement": ">= 0.2.2"
     }
   ],
   "types": [
