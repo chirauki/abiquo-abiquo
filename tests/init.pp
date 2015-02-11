@@ -9,4 +9,10 @@
 # Learn more about module testing here:
 # http://docs.puppetlabs.com/guides/tests_smoke.html
 #
-include abiquo
+class { 'abiquo':
+  abiquo_version    => "3.2",
+  upgrade_packages  => false,
+  gpgcheck          => true,
+  baserepo          => "http://mirror.abiquo.com/abiquo/3.2/os/x86_64/",
+  rollingrepo       => "http://mirror.abiquo.com/abiquo/3.2/updates/x86_64/"
+}
