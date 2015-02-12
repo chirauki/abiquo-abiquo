@@ -8,16 +8,16 @@ class abiquo::monitoring::kairosdb {
   }
 
   package { 'kairosdb':
-    ensure    => installed,
-    provider  => 'rpm',
-    source    => 'http://dl.bintray.com/brianhks/generic/kairosdb-0.9.3-2.rpm'
+    ensure   => installed,
+    provider => 'rpm',
+    source   => 'http://dl.bintray.com/brianhks/generic/kairosdb-0.9.3-2.rpm'
   }
 
   service { 'kairosdb':
     ensure    => 'running',
     enable    => true,
     hasstatus => false,
-    pattern   => "java.*org.kairosdb.core.Main*"
+    pattern   => 'java.*org.kairosdb.core.Main*'
     require   => Package['kairosdb']
   }
 

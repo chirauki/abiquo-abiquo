@@ -12,7 +12,7 @@ class abiquo::zookeeper {
     require => Yumrepo['abiquo-base']
   }
 
-  service { "zookeeper":
+  service { 'zookeeper':
     ensure  => running,
     enable  => true,
     require => Package['zookeeper']

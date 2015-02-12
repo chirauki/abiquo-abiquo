@@ -1,5 +1,5 @@
 class abiquo::mariadb {
-  package { [ "MariaDB-server", "MariaDB-client" ]:
+  package { [ 'MariaDB-server', 'MariaDB-client' ]:
     ensure  => latest,
     require => Yumrepo['Abiquo-Base']
   }

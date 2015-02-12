@@ -17,16 +17,16 @@ class abiquo::kvm (
   }
 
   file { '/etc/abiquo-aim.ini':
-    ensure    => present,
-    owner     => 'root',
-    group     => 'root',
-    mode      => '0644',
-    content   => template('abiquo/abiquo-aim.ini.erb'),
-    notify    => Service['abiquo-aim'],
-    require   => Package['abiquo-aim']
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template('abiquo/abiquo-aim.ini.erb'),
+    notify  => Service['abiquo-aim'],
+    require => Package['abiquo-aim']
   }
 
-  service { "abiquo-aim":
+  service { 'abiquo-aim':
     ensure    => running,
     enable    => true,
     hasstatus => false,

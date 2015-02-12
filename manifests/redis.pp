@@ -20,7 +20,7 @@ class abiquo::redis {
     require => User['redis']
   }
 
-  package { "redis":
+  package { 'redis':
     ensure  => latest,
     require => [ Yumrepo['Abiquo-Base'], File['/var/lib/redis'] ]
   }

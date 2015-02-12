@@ -1,1 +1,1 @@
-include abiquo::ntp 
+include abiquo::ntp

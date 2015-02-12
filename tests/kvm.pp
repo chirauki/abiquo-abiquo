@@ -1,4 +1,4 @@
-class { 'abiquo::kvm': 
+class { 'abiquo::kvm':
   redis_host     => '192.168.2.2',
   redis_port     => 6379,
   aim_port       => 8889,

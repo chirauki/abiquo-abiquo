@@ -37,107 +37,61 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version   = "3.2",
+  $abiquo_version   = '3.2',
   $upgrade_packages = false,
   $gpgcheck         = true,
-  $baserepo         = "",
-  $rollingrepo      = ""
+  $baserepo         = '',
+  $rollingrepo      = ''
 ){
-  include abiquo::ntp 
+  include abiquo::ntp
   
-  yumrepo { "Abiquo-Base":
-    name          => "abiquo-base",
-    descr         => "abiquo-base-${abiquo_version}",
-    baseurl       => $baserepo ? {
-      ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
-      default   => $baserepo
-    },
-    gpgcheck      => $gpgcheck ? {
-      true  => 1,
-      false => 0,
-    },
-    http_caching  => "none",
-    notify        => Exec['yum-clean-metadata']
+  $baserepourl = $baserepo ? {
+    ''        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/os/x86_64/",
+    default   => $baserepo
   }
 
-  yumrepo { "Abiquo-Rolling":
-    name          => "abiquo-rolling",
-    descr         => "abiquo-rolling-${abiquo_version}",
-    baseurl       => $rollingrepo ? {
-      ""        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/updates/x86_64/",
-      default   => $rollingrepo
-    },
-    gpgcheck      => $gpgcheck ? {
-      true  => 1,
-      false => 0,
-    },
-    http_caching  => "none",
-    require       => Yumrepo['Abiquo-Base'],
-    notify        => Exec['yum-clean-metadata']
+  $rollingrepourl = $rollingrepo ? {
+    ''        => "http://mirror.abiquo.com/abiquo/${abiquo_version}/updates/x86_64/",
+    default   => $rollingrepo
+  }
+
+  $gpgcheckval = $gpgcheck ? {
+    true  => 1,
+    false => 0,
+  }
+
+  yumrepo { 'Abiquo-Base':
+    name         => 'abiquo-base',
+    descr        => "abiquo-base-${abiquo_version}",
+    baseurl      => $baserepourl,
+    gpgcheck     => $gpgcheckval,
+    http_caching => 'none',
+    notify       => Exec['yum-clean-metadata']
+  }
+
+  yumrepo { 'Abiquo-Rolling':
+    name         => 'abiquo-rolling',
+    descr        => "abiquo-rolling-${abiquo_version}",
+    baseurl      => $rollingrepourl,
+    gpgcheck     => $gpgcheckval,
+    http_caching => 'none',
+    require      => Yumrepo['Abiquo-Base'],
+    notify       => Exec['yum-clean-metadata']
   }
 
   exec { 'yum-clean-metadata':
     path        => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
-    command     => "yum clean all",
+    command     => 'yum clean all',
     refreshonly => true
   }
 
-  class { 'selinux': 
+  class { 'selinux':
     mode => 'disabled'
   }
 
   host { 'Add hostname to /etc/hosts':
-    ensure  => present,
-    name    => $::hostname,
-    ip      => $::ipaddress,
-  }
-
-  # used by other modules to register themselves in the motd
-  define abiproperties::register($content="", $order=10) {
-    if $content == "" {
-      $body = $name
-    } else {
-      $body = $content
-    }
-
-    concat::fragment{ "properties_fragment_$name":
-      target  => '/opt/abiquo/config/abiquo.properties',
-      order   => $order,
-      content => "$body"
-    }
-  }
-
-  define property($propname="", $value, $section) {
-    if $propname == "" {
-      $realname = $title
-    } else {
-      $realname = $propname
-    }
-
-    $offset = $section ? {
-      'server'          => 10,
-      'remote-services' => 20,
-    }
-
-    $sum = stringsum($realname)
-    abiproperties::register { "property_$realname":
-      content => "$realname = $value\n",
-      order   => "$offset",
-    }
-
-    if $realname == "abiquo.appliancemanager.repositoryLocation" {
-      file { "/opt/vm_repository":
-        ensure => 'directory'
-      }
-
-      mount { "/opt/vm_repository":
-        device  => "$value",
-        fstype  => "nfs",
-        ensure  => "mounted",
-        options => "defaults",
-        atboot  => true,
-        require => File['/opt/vm_repository'],
-      }
-    }
+    ensure => present,
+    name   => $::hostname,
+    ip     => $::ipaddress,
   }
 }

@@ -1,9 +1,9 @@
 class abiquo::monitoring::cassandra {
-  yumrepo { "datastax":
+  yumrepo { 'datastax':
     ensure   => present,
-    name     => "datastax",
-    descr    => "datastax",
-    baseurl  => "http://rpm.datastax.com/community",
+    name     => 'datastax',
+    descr    => 'datastax',
+    baseurl  => 'http://rpm.datastax.com/community',
     gpgcheck => 0,
     enabled  => true
   }

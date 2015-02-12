@@ -6,7 +6,7 @@ class abiquo::firewall {
 
   class { ['abiquo::firewall::pre', 'abiquo::firewall::post']: }
   ->
-  resources { "firewall": purge => true }
+  resources { 'firewall': purge => true }
 
   firewall { '100 allow http and https access':
     port   => [80, 443],
