@@ -1,12 +1,12 @@
 {
   "name": "abiquo-abiquo",
   "version": "0.1.0",
+  "author": "Marc Ciraququi <marc.cirauqui@abiquo.com>",
+  "license": "Apache-2.0",
+  "summary": "Allows to setup basic Abiquo components",
   "source": "git@github.com:chirauki/abiquo-abiquo.git",
-  "author": "abiquo",
-  "license": "Apache License, Version 2.0",
-  "summary": "Abiquo puppet module",
-  "description": "Allows to setup basic Abiquo components",
-  "project_page": "https://github.com/chirauki/abiquo-abiquo", 
+  "project_page": "https://github.com/chirauki/abiquo-abiquo",
+  "issues_url": "https://github.com/chirauki/abiquo-abiquo/issues",
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
@@ -32,38 +32,5 @@
       "name": "jfryman/selinux",
       "version_requirement": ">= 0.2.2"
     }
-  ],
-  "types": [
-
-  ],
-  "checksums": {
-    "Modulefile": "89c93f6c608da4a11932fea3c5662087",
-    "README.md": "2cb6fe510437df38b39d2caaef6c9f17",
-    "lib/facter/check_kinton.rb": "c097ffd04a23a13d329ee91904610709",
-    "lib/puppet/parser/functions/hash2props.rb": "123eeaac614921c34a01daa7a5d575a1",
-    "lib/puppet/parser/functions/jsonreplace.rb": "f3b3c30207fadb3f8e8ff3bc6f652ece",
-    "lib/puppet/parser/functions/stringsum.rb": "d1da6c18d615cd596ebd0a3987a2b999",
-    "manifests/api.pp": "c0a5b98756a09ac8520a481da8396c98",
-    "manifests/client.pp": "98773d18dd9ca8d98357e03e9223d274",
-    "manifests/firewall/post.pp": "20f474cdc91b1d3ee5c56a70ea380958",
-    "manifests/firewall/pre.pp": "04dfcff6b51160387dc9535fa7a720f9",
-    "manifests/firewall.pp": "92f1b8270a634941e731c499e99da4bc",
-    "manifests/init.pp": "e7fd8ab85408b8afce2be36085707106",
-    "manifests/jdk.pp": "e58ff2ed8bce70a4f4c1ef86b4273aa5",
-    "manifests/mariadb.pp": "5526c7c30e79508d450c8d9416a5f8b5",
-    "manifests/params.pp": "e98ed0953cea94ba6909ec3e6c396212",
-    "manifests/rabbit.pp": "ea74d8e5d8b865a25a25dd5d4f272e23",
-    "manifests/redis.pp": "89ee4c3b843df735f27e0ead0eb1b657",
-    "manifests/remoteservice.pp": "205d14ad8f1f73008c16960994936dfd",
-    "manifests/tomcat.pp": "e0a164e80a9c66e16643fcd8a0618bfe",
-    "manifests/v2v.pp": "ed38a7c82149487c3b520d5b5290e099",
-    "manifests/zookeeper.pp": "4040b477ec171d382c2e7d0c0bd292f0",
-    "spec/spec_helper.rb": "a55d1e6483344f8ec6963fcb2c220372",
-    "templates/properties.datacenter.erb": "38c51939579f3376b137e5ba533c8eba",
-    "templates/properties.header.erb": "e08454f6d892aa9be4e875ebe0ad2dc5",
-    "templates/properties.publiccloud.erb": "1091026861c25c9d17891bec19a011fa",
-    "templates/properties.server.erb": "60336c2f6f10f9f8e3fde02c4e7ab899",
-    "templates/server.xml.erb": "b62325a75078de37449b1b539cbab664",
-    "tests/init.pp": "3d702ec913bcac6b94cef9d4acc8acd5"
-  }
+  ]
 }
