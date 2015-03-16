@@ -133,7 +133,7 @@ class abiquo::client (
     }
     else {
       # Set API location in client-config.json
-      $secure_value = secure ? {
+      $secure_value = $secure ? {
         true  => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"https:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
         false => "sed -i 's/\\\"config.endpoint\\\":.*,/\\\"config.endpoint\\\": \\\"http:\\/\\/${f_api_endpoint}\\/api\\\",/' /var/www/html/ui/config/client-config.json",
       }

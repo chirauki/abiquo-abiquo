@@ -1,11 +1,11 @@
 name    'abiquo-abiquo'
 version '0.1.0'
-source 'UNKNOWN'
-author 'abiquo'
-license 'Apache License, Version 2.0'
-summary 'UNKNOWN'
-description 'UNKNOWN'
-project_page 'UNKNOWN'
+source 'git@github.com:chirauki/abiquo-abiquo.git'
+author 'Marc Ciraququi <marc.cirauqui@abiquo.com>'
+license 'Apache-2.0'
+summary 'Allows to setup basic Abiquo components'
+description 'Allows to setup basic Abiquo components'
+project_page 'https://github.com/chirauki/abiquo-abiquo'
 
 ## Add dependencies, if any:
 dependency 'puppetlabs/concat', '>= 1.1.0'
