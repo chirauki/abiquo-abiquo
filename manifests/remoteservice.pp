@@ -36,7 +36,7 @@ class abiquo::remoteservice (
   }
   
   abiquo::properties_register { 'Server properties for RS':
-    content => '[remote-services]\n',
+    content => '[remote-services]',
     order   => '15',
   }
 

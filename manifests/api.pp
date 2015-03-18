@@ -124,7 +124,7 @@ class abiquo::api (
   }
 
   abiquo::properties_register { 'Server properties for API':
-    content => '[server]\n',
+    content => '[server]',
     order   => '05',
   }
 

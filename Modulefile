@@ -1,5 +1,5 @@
 name    'abiquo-abiquo'
-version '0.1.1'
+version '0.1.2'
 source 'git@github.com:chirauki/abiquo-abiquo.git'
 author 'Marc Ciraququi <marc.cirauqui@abiquo.com>'
 license 'Apache-2.0'
