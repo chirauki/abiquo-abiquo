@@ -11,8 +11,13 @@ class abiquo::kvm (
   
   $pkgs = [ 'abiquo-aim', 'libvirt', 'qemu-kvm' ]
 
+  $ensure = $abiquo::upgrade_packages ? {
+    true  => latest,
+    false => present,
+  }
+
   package { $pkgs:
-    ensure  => installed,
+    ensure  => $ensure,
     require => Yumrepo['abiquo-base']
   }
 
