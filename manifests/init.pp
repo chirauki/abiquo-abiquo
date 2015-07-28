@@ -37,9 +37,13 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version   = '3.2',
+  $abiquo_version   = '3.4',
   $upgrade_packages = false,
   $gpgcheck         = true,
+  $gpgkeys          = "http://mirror.abiquo.com/RPM-GPG-KEY-Abiquo
+  http://mirror.abiquo.com/RPM-GPG-KEY-MariaDB
+  http://mirror.abiquo.com/RPM-GPG-KEY-RabbitMQ
+  http://mirror.abiquo.com/RPM-GPG-RSA-KEY-Abiquo",
   $baserepo         = '',
   $rollingrepo      = ''
 ){
@@ -65,6 +69,7 @@ class abiquo (
     descr        => "abiquo-base-${abiquo_version}",
     baseurl      => $baserepourl,
     gpgcheck     => $gpgcheckval,
+    gpgkey       => $gpgkeys,
     http_caching => 'none',
     notify       => Exec['yum-clean-metadata']
   }
@@ -74,6 +79,7 @@ class abiquo (
     descr        => "abiquo-rolling-${abiquo_version}",
     baseurl      => $rollingrepourl,
     gpgcheck     => $gpgcheckval,
+    gpgkey       => $gpgkeys,
     http_caching => 'none',
     require      => Yumrepo['Abiquo-Base'],
     notify       => Exec['yum-clean-metadata']

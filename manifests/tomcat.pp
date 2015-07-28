@@ -16,4 +16,10 @@ class abiquo::tomcat {
     notify  => Service['abiquo-tomcat'],
     require => Concat['/opt/abiquo/config/abiquo.properties']
   }
+
+  firewall { '100 allow Tomcat access':
+    port   => 8009,
+    proto  => tcp,
+    action => accept,
+  }
 }

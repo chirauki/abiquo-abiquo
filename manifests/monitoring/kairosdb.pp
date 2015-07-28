@@ -1,6 +1,4 @@
 class abiquo::monitoring::kairosdb {
-  include abiquo::firewall
-
   firewall { '100 allow kairosdb http access':
     port   => 8080,
     proto  => tcp,
@@ -10,7 +8,7 @@ class abiquo::monitoring::kairosdb {
   package { 'kairosdb':
     ensure   => installed,
     provider => 'rpm',
-    source   => 'http://dl.bintray.com/brianhks/generic/kairosdb-0.9.3-2.rpm'
+    source   => 'https://github.com/kairosdb/kairosdb/releases/download/v0.9.4/kairosdb-0.9.4-6.rpm'
   }
 
   service { 'kairosdb':

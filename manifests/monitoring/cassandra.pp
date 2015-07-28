@@ -8,7 +8,7 @@ class abiquo::monitoring::cassandra {
     enabled  => true
   }
 
-  package { [ 'java-1.7.0-openjdk', 'cassandra20' ]:
+  package { [ 'java-1.7.0-openjdk', 'cassandra20', 'jna' ]:
     ensure  => present,
     require => Yumrepo['datastax']
   }

@@ -8,18 +8,8 @@ class abiquo::firewall {
   ->
   resources { 'firewall': purge => true }
 
-  firewall { '100 allow http and https access':
-    port   => [80, 443],
-    proto  => tcp,
-    action => accept,
-  }->
   firewall { '100 allow ssh access':
     port   => 22,
-    proto  => tcp,
-    action => accept,
-  }->
-  firewall { '100 allow Tomcat access':
-    port   => 8009,
     proto  => tcp,
     action => accept,
   }

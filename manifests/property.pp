@@ -1,4 +1,4 @@
-define abiquo::property($value, $propname='') {
+define abiquo::property($value, $section='', $propname='') {
   if $propname == '' {
     $realname = $title
   } else {

@@ -3,7 +3,9 @@ class abiquo::client (
   $ui_custom      = {},
   $api_address    = '',
   $api_endpoint   = '',
+  $proxy_timeout  = 600
 ) {
+  include abiquo::ntp
   include abiquo::jdk
   include abiquo::firewall
   
@@ -52,7 +54,7 @@ class abiquo::client (
       $proxy_pass = [
         { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
         { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
-        { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am", 'params' => {'timeout' => '60000'} },
+        { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am", 'params' => {'timeout' => $proxy_timeout} },
       ]
     }
     else {
@@ -152,5 +154,11 @@ class abiquo::client (
       require => [ Yumrepo['Abiquo-Rolling'], Package['jdk'] ],
       notify  => Service['abiquo-tomcat']
     }
+  }
+
+  firewall { '100 allow http and https access':
+    port   => [80, 443],
+    proto  => tcp,
+    action => accept,
   }
 }

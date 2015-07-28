@@ -38,4 +38,16 @@ class abiquo::kvm (
     pattern   => '/usr/sbin/abiquo-aim',
     require   => Package['abiquo-aim']
   }
+
+  firewall { '100 allow VNC access':
+    port   => 5900-5999,
+    proto  => tcp,
+    action => accept,
+  }
+
+  firewall { '100 allow AIM access':
+    port   => $aim_port,
+    proto  => tcp,
+    action => accept,
+  }
 }

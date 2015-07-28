@@ -1,4 +1,5 @@
 class abiquo::zookeeper {
+  include abiquo::firewall
   include abiquo::ntp
 
   firewall { '100 allow zookeeper access':
