@@ -18,4 +18,6 @@ class abiquo::monitoring::cassandra {
     enable  => true,
     require => Package['cassandra20']
   }
+
+  sysctl { 'vm.max_map_count': value => '131072' }
 }
