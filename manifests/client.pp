@@ -52,7 +52,7 @@ class abiquo::client (
       $proxy_pass = [
         { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
         { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
-        { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am" },
+        { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am", 'params' => {'timeout' => '60000'} },
       ]
     }
     else {

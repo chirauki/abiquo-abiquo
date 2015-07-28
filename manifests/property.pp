@@ -1,19 +1,14 @@
-define abiquo::property($value, $section, $propname='') {
+define abiquo::property($value, $propname='') {
   if $propname == '' {
     $realname = $title
   } else {
     $realname = $propname
   }
 
-  $offset = $section ? {
-    'server'          => 10,
-    'remote-services' => 20,
-  }
-
   $sum = stringsum($realname)
   abiquo::properties_register { "property_${realname}":
     content => "${realname} = ${value}\n",
-    order   => $offset,
+    order   => $sum,
   }
 
   if $realname == 'abiquo.appliancemanager.repositoryLocation' {
