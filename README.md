@@ -11,6 +11,7 @@ Depends on:
  - [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
  - [puppetlabs/firewall](https://forge.puppetlabs.com/puppetlabs/firewall)
  - [spiette/selinux](https://forge.puppetlabs.com/spiette/selinux)
+ - [thias/sysctl](https://forge.puppetlabs.com/thias/sysctl)
 
 #Notice on JCE
 
@@ -46,9 +47,13 @@ This is the base class. Its only purpose is to be able to define a different Abi
 
 ```
 class { 'abiquo':
-  abiquo_version    => "3.2",
+  abiquo_version    => "3.4",
   upgrade_packages  => false,
   gpgcheck          => true,
+  gpgkeys          = "http://mirror.abiquo.com/RPM-GPG-KEY-Abiquo
+  http://mirror.abiquo.com/RPM-GPG-KEY-MariaDB
+  http://mirror.abiquo.com/RPM-GPG-KEY-RabbitMQ
+  http://mirror.abiquo.com/RPM-GPG-RSA-KEY-Abiquo",
   baserepo          => "http://myrepo/packages/",
   rollingrepo       => "http://myrepo/updates/"
 }
@@ -59,6 +64,7 @@ class { 'abiquo':
 - **abiquo_version** a string denoting a major version of Abiquo (ie. 2.4, 2.6, etc. Not 2.4.1, 2.4.2, etc.).
 - **upgrade_packages** boolean determinig wether or not Abiquo packages will be updated or not.
 - **gpgcheck** boolean determinig wether or not Abiquo yum repositories will validate GPG signatures on packages.
+- **gpgkeys** YUM GPG keys to verify Abiquo packages signatures.
 - **baserepo** a URL if you want to use a custom yum repo for base packages.
 - **rollingrepo** a URL if you want to use a custom yum repo for development version of RPM packages.
 
@@ -102,7 +108,8 @@ class { 'abiquo::client':
   secure        => true,
   ui_custom     => {}
   api_address   => $::ipaddress,
-  api_endpoint  => $::ipaddress
+  api_endpoint  => $::ipaddress,
+  proxy_timeout => 600
 }
 ```
 
@@ -112,6 +119,7 @@ class { 'abiquo::client':
 - **ui_custom** From Abiquo 3.4, this hash will be set as the custom client config file.
 - **api_address** is the IP address set as Apache proxy destination for Abiquo 3.2 or earlier.
 - **api_endpoint** is the IP address to set as ```config.endpoint``` in UI's config file for Abiquo 3.2 or earlier.
+- **proxy_timeout** is the timeout value for Apache proxy directive for AM.
 
 
 ##Abiquo remote services
@@ -205,18 +213,19 @@ To set a property, you must make sure it is defined before the class that will u
 
 ```
 abiquo::property { "some.property":
-  value => "somevalue",
-  section => "server"
+  value => "somevalue"
 }
 ```
+
+**Note** Specifying the property ```abiquo.appliancemanager.repositoryLocation``` will automatically setup the mount of the repository. For more 
+
 
 ####Parameters
 
 - **propname** is optional and defults to the resource title. It specifies the property name you want to set.
 - **value** is the value of the property you want to set.
-- **section** is the section in the properties file where the property should be. It can be either ```server``` or ```remote-services```
 
-**Note** Specifying the property ```abiquo.appliancemanager.repositoryLocation``` will automatically setup the mount of the repository. For more information check [Abiquo wiki](http://wiki.abiquo.com/display/ABI32/Abiquo+Configuration+Properties)
+**Note** The ```section``` parameter has been removed in the latest release. The module will omit it if defined.
 
 #Examples
 
