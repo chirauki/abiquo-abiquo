@@ -68,10 +68,18 @@ class abiquo::api (
 
   if $::kinton_present == 1 {
     #notify { "Abiquo liquibase update present. Running.": }
-    exec { 'Abiquo liquibase update':
+    exec { 'Abiquo liquibase-update':
       path        => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
       command     => '/usr/bin/abiquo-liquibase-update',
       onlyif      => '/usr/bin/which abiquo-liquibase-update',
+      require     => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ],
+      refreshonly => true,
+    }
+
+    exec { 'Abiquo liquibase update':
+      path        => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
+      command     => '/usr/bin/abiquo-liquibase update',
+      onlyif      => '/usr/bin/which abiquo-liquibase',
       require     => [ Package['abiquo-server'], Exec['Stop Abiquo tomcat before upgrade.'] ],
       refreshonly => true,
     }
