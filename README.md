@@ -105,21 +105,49 @@ Client class installs the flex client app for 2.6 or the ui webapp for 2.8+
 
 ```
 class { 'abiquo::client': 
-  secure        => true,
-  ui_custom     => {}
-  api_address   => $::ipaddress,
-  api_endpoint  => $::ipaddress,
-  proxy_timeout => 600
+  secure         = true,
+  self_signed    = true,
+  ssl_cert       = '/etc/pki/tls/certs/localhost.crt',
+  ssl_key        = '/etc/pki/tls/private/localhost.key',
+  ssl_certs_dir  = '',
+  ui_custom      = {},
+  api_address    = '',
+  api_endpoint   = '',
+  proxy_timeout  = 600,
+  servername     = $::fqdn,
+  am_proxy       = []
 }
 ```
 
 ####Parameters
 
-- **secure determines** wether SSL will be set up or not in Apache server hosting the UI webapp (2.8+).
+- **secure** determines wether SSL will be set up or not in Apache server hosting the UI webapp (2.8+).
+- **self_signed** determines wether SSL will use a self signed certificate. If not, you should define the path to your cert.
+- **ssl_cert** The path to your SSL certificate file.
+- **ssl_key** The path to the private key file for your cert.
+- **ssl_certs_dir** The path where the certificate files are located.
 - **ui_custom** From Abiquo 3.4, this hash will be set as the custom client config file.
 - **api_address** is the IP address set as Apache proxy destination for Abiquo 3.2 or earlier.
 - **api_endpoint** is the IP address to set as ```config.endpoint``` in UI's config file for Abiquo 3.2 or earlier.
 - **proxy_timeout** is the timeout value for Apache proxy directive for AM.
+- **servername** The ```servername``` directive to be used in Apache vhost file.
+- **am_proxy** Is a hash of ```apache::vhost``` objects, in case you need to add vHosts to serve Abiquo AM on a distributed installation. Example:
+
+```puppet
+class { 'abiquo::client': 
+  ui_custom => {
+    'config.endpoint' => "https://$::ipaddress_eth1/api"
+  },
+  am_proxy => {
+    'test1.abiquo-dev.bcn.abiquo.com' => {
+      'proxy_pass' => { 'path' => '/am', 'url' => 'http://10.60.10.18:8009/am' },
+    },
+    'test2.abiquo-dev.bcn.abiquo.com' => {
+      'proxy_pass' => { 'path' => '/am', 'url' => 'http://10.60.10.20:8009/am' },
+    }
+  }
+}
+```
 
 
 ##Abiquo remote services

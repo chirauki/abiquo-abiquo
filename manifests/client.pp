@@ -1,9 +1,15 @@
 class abiquo::client (
   $secure         = true,
+  $self_signed    = true,
+  $ssl_cert       = '/etc/pki/tls/certs/localhost.crt',
+  $ssl_key        = '/etc/pki/tls/private/localhost.key',
+  $ssl_certs_dir  = '',
   $ui_custom      = {},
   $api_address    = '',
   $api_endpoint   = '',
-  $proxy_timeout  = 600
+  $proxy_timeout  = 600,
+  $servername     = $::fqdn,
+  $am_proxy       = []
 ) {
   include abiquo::ntp
   include abiquo::jdk
@@ -50,38 +56,107 @@ class abiquo::client (
     class { 'apache::mod::proxy': }
     class { 'apache::mod::proxy_ajp': }
 
+    $proxy_pass = [
+      { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
+      { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
+      { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am", 'params' => {'timeout' => $proxy_timeout} },
+    ]
+    
     if $secure == true {
-      $proxy_pass = [
-        { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
-        { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
-        { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am", 'params' => {'timeout' => $proxy_timeout} },
-      ]
-    }
-    else {
-      $proxy_pass = [
-        { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
-        { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
-      ]
-    }
+      if $self_signed == true {
+        file { '/etc/pki/abiquo':
+          ensure => directory
+        }
 
-    if $secure == true {
-      apache::vhost { 'abiquo-ssl':
-        port        => '443',
-        docroot     => '/var/www/html',
-        ssl         => true,
-        proxy_pass  => $proxy_pass,
-        directories => [ {
-            path             => '/var/www/html/ui',
-            'options'        => 'MultiViews FollowSymLinks',
-            'allowoverride'  => 'None',
-            'order'          => 'allow,deny',
-            'allow'          => 'from all',
-            'directoryindex' => 'index.html'
-          } ],
-        rewrites    => [ {
-            rewrite_rule => ['^/$ /ui/ [R]']
-          } ],
-        require     => Package['abiquo-ui']
+        openssl::certificate::x509 { $servername:
+          ensure       => present,
+          country      => 'ES',
+          organization => 'Abiquo.com',
+          commonname   => $servername,
+          state        => 'Barcelona',
+          locality     => 'Barcelona',
+          unit         => 'Puppet Masters',
+          email        => 'abipuppet@abiquo.com',
+          days         => 3650,
+          base_dir     => '/etc/pki/abiquo',
+          owner        => 'root',
+          group        => 'root',
+          force        => false,
+          require      => File['/etc/pki/abiquo']
+        }
+
+        $vhost_defaults = {
+          port          => '443',
+          docroot       => '/var/www/html',
+          ssl           => true,
+          ssl_cert      => "/etc/pki/abiquo/$servername.crt",
+          ssl_key       => "/etc/pki/abiquo/$servername.key",
+          ssl_certs_dir => '/etc/pki/abiquo/',
+          require       => Openssl::Certificate::X509[$servername]
+        }
+
+        unless empty($am_proxy) == true {
+          create_resources(apache::vhost, $am_proxy, $vhost_defaults)
+        }
+
+        apache::vhost { 'abiquo-ssl':
+          servername    => $servername,
+          port          => '443',
+          docroot       => '/var/www/html',
+          ssl           => true,
+          ssl_cert      => "/etc/pki/abiquo/$servername.crt",
+          ssl_key       => "/etc/pki/abiquo/$servername.key",
+          ssl_certs_dir => '/etc/pki/abiquo/',
+          proxy_pass    => $proxy_pass,
+          directories   => [ {
+              path             => '/var/www/html/ui',
+              'options'        => 'MultiViews FollowSymLinks',
+              'allowoverride'  => 'None',
+              'order'          => 'allow,deny',
+              'allow'          => 'from all',
+              'directoryindex' => 'index.html'
+            } ],
+          rewrites      => [ {
+              rewrite_rule => ['^/$ /ui/ [R]']
+            } ],
+          require       => [ Package['abiquo-ui'], Openssl::Certificate::X509[$servername] ]
+        }
+      } else {
+        $vhost_defaults = {
+          port          => '443',
+          docroot       => '/var/www/html',
+          ssl           => true,
+          ssl_cert      => $ssl_cert,
+          ssl_key       => $ssl_key,
+          ssl_certs_dir => $ssl_certs_dir,
+        }
+
+        unless empty($am_proxy) == true {
+          create_resources(apache::vhost, $am_proxy, $vhost_defaults)
+        }
+
+        apache::vhost { 'abiquo-ssl':
+          servername    => $servername,
+          port          => '443',
+          docroot       => '/var/www/html',
+          ssl           => true,
+          ssl_cert      => $ssl_cert,
+          ssl_key       => $ssl_key,
+          ssl_certs_dir => $ssl_certs_dir,
+          proxy_pass    => $proxy_pass,
+          directories   => [ {
+              path             => '/var/www/html/ui',
+              'options'        => 'MultiViews FollowSymLinks',
+              'allowoverride'  => 'None',
+              'order'          => 'allow,deny',
+              'allow'          => 'from all',
+              'directoryindex' => 'index.html'
+            } ],
+          rewrites      => [ {
+              rewrite_rule => ['^/$ /ui/ [R]']
+            } ],
+          require       => Package['abiquo-ui']
+        }
       }
 
       apache::vhost { 'abiquo-redir':
