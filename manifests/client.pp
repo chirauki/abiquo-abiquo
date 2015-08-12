@@ -9,7 +9,7 @@ class abiquo::client (
   $api_endpoint   = '',
   $proxy_timeout  = 600,
   $servername     = $::fqdn,
-  $am_proxy       = {}
+  $am_proxy       = []
 ) {
   include abiquo::ntp
   include abiquo::jdk
@@ -56,7 +56,7 @@ class abiquo::client (
     class { 'apache::mod::proxy': }
     class { 'apache::mod::proxy_ajp': }
 
-    $proxy_pass = [
+    $default_proxy_pass = [
       { 'path' => '/api', 'url' => "ajp://${f_api_address}:8010/api" },
       { 'path' => '/legal', 'url' => "ajp://${f_api_address}:8010/legal" },
       { 'path' => '/am', 'url' => "ajp://${f_api_address}:8010/am", 'params' => {'timeout' => $proxy_timeout} },
@@ -85,19 +85,21 @@ class abiquo::client (
           require      => File['/etc/pki/abiquo']
         }
 
-        $vhost_defaults = {
-          port          => '443',
-          docroot       => '/var/www/html',
-          ssl           => true,
-          ssl_cert      => "/etc/pki/abiquo/$servername.crt",
-          ssl_key       => "/etc/pki/abiquo/$servername.key",
-          ssl_certs_dir => '/etc/pki/abiquo/',
-          require       => Openssl::Certificate::X509[$servername]
-        }
+        # $vhost_defaults = {
+        #   port          => '443',
+        #   docroot       => '/var/www/html',
+        #   ssl           => true,
+        #   ssl_cert      => "/etc/pki/abiquo/$servername.crt",
+        #   ssl_key       => "/etc/pki/abiquo/$servername.key",
+        #   ssl_certs_dir => '/etc/pki/abiquo/',
+        #   require       => Openssl::Certificate::X509[$servername]
+        # }
 
-        unless empty($am_proxy) == true {
-          create_resources(apache::vhost, $am_proxy, $vhost_defaults)
-        }
+        # unless empty($am_proxy) == true {
+        #   create_resources(apache::vhost, $am_proxy, $vhost_defaults)
+        # }
+
+        $proxy_pass = concat($default_proxy_pass, $am_proxy)
 
         apache::vhost { 'abiquo-ssl':
           servername    => $servername,
@@ -122,18 +124,20 @@ class abiquo::client (
           require       => [ Package['abiquo-ui'], Openssl::Certificate::X509[$servername] ]
         }
       } else {
-        $vhost_defaults = {
-          port          => '443',
-          docroot       => '/var/www/html',
-          ssl           => true,
-          ssl_cert      => $ssl_cert,
-          ssl_key       => $ssl_key,
-          ssl_certs_dir => $ssl_certs_dir,
-        }
+        # $vhost_defaults = {
+        #   port          => '443',
+        #   docroot       => '/var/www/html',
+        #   ssl           => true,
+        #   ssl_cert      => $ssl_cert,
+        #   ssl_key       => $ssl_key,
+        #   ssl_certs_dir => $ssl_certs_dir,
+        # }
 
-        unless empty($am_proxy) == true {
-          create_resources(apache::vhost, $am_proxy, $vhost_defaults)
-        }
+        # unless empty($am_proxy) == true {
+        #   create_resources(apache::vhost, $am_proxy, $vhost_defaults)
+        # }
+
+        $proxy_pass = concat($default_proxy_pass, $am_proxy)
 
         apache::vhost { 'abiquo-ssl':
           servername    => $servername,

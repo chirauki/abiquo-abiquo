@@ -115,7 +115,7 @@ class { 'abiquo::client':
   api_endpoint   = '',
   proxy_timeout  = 600,
   servername     = $::fqdn,
-  am_proxy       = {}
+  am_proxy       = []
 }
 ```
 
@@ -131,22 +131,18 @@ class { 'abiquo::client':
 - **api_endpoint** is the IP address to set as ```config.endpoint``` in UI's config file for Abiquo 3.2 or earlier.
 - **proxy_timeout** is the timeout value for Apache proxy directive for AM.
 - **servername** The ```servername``` directive to be used in Apache vhost file.
-- **am_proxy** Is a hash of ```apache::vhost``` objects, in case you need to add vHosts to serve Abiquo AM on a distributed installation. Example:
+- **am_proxy** Is an array of ```proxy_pass``` directives for the ```apache::vhost``` object, in case you need to add vHosts to serve Abiquo AM on a distributed installation. Example:
 
 ```puppet
 class { 'abiquo::client': 
   ui_custom => {
     'config.endpoint' => "https://$::ipaddress_eth1/api"
   },
-  am_proxy => {
-    'test1.abiquo-dev.bcn.abiquo.com' => {
-      'proxy_pass' => { 'path' => '/am', 'url' => 'http://10.60.10.18:8009/am' },
-    },
-    'test2.abiquo-dev.bcn.abiquo.com' => {
-      'proxy_pass' => { 'path' => '/am', 'url' => 'http://10.60.10.20:8009/am' },
-    }
-  }
-}
+  am_proxy => [
+    { 'path' => '/am-rs', 'url' => 'http://10.60.10.18:8009/am' },
+    { 'path' => '/am-mono', 'url' => 'http://10.60.10.20:8009/am' },
+  ]
+} 
 ```
 
 
