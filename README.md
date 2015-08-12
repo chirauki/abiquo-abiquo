@@ -115,7 +115,7 @@ class { 'abiquo::client':
   api_endpoint   = '',
   proxy_timeout  = 600,
   servername     = $::fqdn,
-  am_proxy       = []
+  am_proxy       = {}
 }
 ```
 
