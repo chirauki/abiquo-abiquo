@@ -3,7 +3,7 @@ class abiquo::monitoring::watchtower (
   $install_db             = true,
   $db_host                = 'localhost',
   $db_user                = 'root',
-  $db_pass                = ''
+  $db_pass                = '',
   $emmett_settings        = {
     "emmett.kairosdb.host"   => "localhost",
     "amqp.rabbitmq.host"     => "localhost",
