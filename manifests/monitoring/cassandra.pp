@@ -1,23 +1,23 @@
-class abiquo::monitoring::cassandra {
-  yumrepo { 'datastax':
-    ensure   => present,
-    name     => 'datastax',
-    descr    => 'datastax',
-    baseurl  => 'http://rpm.datastax.com/community',
-    gpgcheck => 0,
-    enabled  => true
+class abiquo::monitoring::cassandra (
+  $cassandra_cluster_name = "abiquo"
+) {
+  include cassandra::datastax_repo
+  include cassandra::java
+
+  # Install Cassandra on the node.
+  class { 'cassandra':
+    authenticator   => 'PasswordAuthenticator',
+    cluster_name    => $cassandra_cluster_name,
+    endpoint_snitch => 'GossipingPropertyFileSnitch',
+    listen_address  => $::ipaddress,
+    seeds           => $::ipaddress,
+    service_systemd => true,
+    require         => Class['cassandra::datastax_repo', 'cassandra::java'],
   }
 
-  package { [ 'java-1.7.0-openjdk', 'cassandra20', 'jna' ]:
-    ensure  => present,
-    require => Yumrepo['datastax']
+  firewall { '100 allow cassandra access':
+    port   => 9160,
+    proto  => tcp,
+    action => accept,
   }
-
-  service { 'cassandra':
-    ensure  => running,
-    enable  => true,
-    require => Package['cassandra20']
-  }
-
-  sysctl { 'vm.max_map_count': value => '131072' }
 }

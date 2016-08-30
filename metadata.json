@@ -9,7 +9,7 @@
   "issues_url": "https://github.com/chirauki/abiquo-abiquo/issues",
   "operatingsystem_support": [
     {
-      "operatingsystem": "CentOS",
+      "operatingsystem": "CentOS", "RedHat"
       "operatingsystemrelease": [
         "6"
       ]
@@ -39,6 +39,18 @@
     {
       "name": "camptocamp/openssl",
       "version_requirement": ">= 0.3.1"
+    },
+    {
+      "name": "locp/cassandra",
+      "version_requirement": ">= 1.25.1"
+    },
+    {
+      "name": "jmkeyes/kairosdb",
+      "version_requirement": ">= 0.0.6"
+    },
+    {
+      "name": "puppetlabs/hocon",
+      "version_requirement": ">= 0.9.4"
     }
   ]
 }

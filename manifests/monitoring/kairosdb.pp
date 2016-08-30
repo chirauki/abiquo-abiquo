@@ -1,31 +1,21 @@
-class abiquo::monitoring::kairosdb {
+class abiquo::monitoring::kairosdb (
+  $kairosdb_port          = 8080,
+  $kairosdb_version       = "0.9.4-6",
+) 
+{
   firewall { '100 allow kairosdb http access':
-    port   => 8080,
+    port   => $kairosdb_port,
     proto  => tcp,
     action => accept,
   }
 
-  package { 'kairosdb':
-    ensure   => installed,
-    provider => 'rpm',
-    source   => 'https://github.com/kairosdb/kairosdb/releases/download/v0.9.4/kairosdb-0.9.4-6.rpm'
+  class { '::kairosdb':
+    version => $kairosdb_version,
   }
 
-  service { 'kairosdb':
-    ensure    => 'running',
-    enable    => true,
-    hasstatus => false,
-    pattern   => 'java.*org.kairosdb.core.Main*',
-    require   => Package['kairosdb']
-  }
-
-  file { '/opt/kairosdb/conf/kairosdb.properties':
-    ensure  => present,
-    source  => 'puppet:///modules/abiquo/monitoring/kairosdb.properties',
-    mode    => '0644',
-    owner   => 'root',
-    group   => 'root',
-    require => Package['kairosdb'],
-    notify  => Service['kairosdb']
+  class { '::kairosdb::datastore::cassandra':
+    hosts => [
+      "$::ipaddress:9160"
+    ],
   }
 }

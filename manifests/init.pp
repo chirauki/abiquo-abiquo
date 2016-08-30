@@ -37,7 +37,7 @@
 # Copyright 2014 Abiquo, unless otherwise noted.
 #
 class abiquo (
-  $abiquo_version   = '3.4',
+  $abiquo_version   = '3.8',
   $upgrade_packages = false,
   $gpgcheck         = true,
   $gpgkeys          = "http://mirror.abiquo.com/RPM-GPG-KEY-Abiquo
