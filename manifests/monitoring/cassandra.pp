@@ -11,7 +11,6 @@ class abiquo::monitoring::cassandra (
     endpoint_snitch => 'GossipingPropertyFileSnitch',
     listen_address  => $::ipaddress,
     seeds           => $::ipaddress,
-    service_systemd => true,
     require         => Class['cassandra::datastax_repo', 'cassandra::java'],
   }
 

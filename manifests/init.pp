@@ -40,10 +40,6 @@ class abiquo (
   $abiquo_version   = '3.8',
   $upgrade_packages = false,
   $gpgcheck         = true,
-  $gpgkeys          = "http://mirror.abiquo.com/RPM-GPG-KEY-Abiquo
-  http://mirror.abiquo.com/RPM-GPG-KEY-MariaDB
-  http://mirror.abiquo.com/RPM-GPG-KEY-RabbitMQ
-  http://mirror.abiquo.com/RPM-GPG-RSA-KEY-Abiquo",
   $baserepo         = '',
   $rollingrepo      = ''
 ){
@@ -69,7 +65,6 @@ class abiquo (
     descr        => "abiquo-base-${abiquo_version}",
     baseurl      => $baserepourl,
     gpgcheck     => $gpgcheckval,
-    gpgkey       => $gpgkeys,
     http_caching => 'none',
     notify       => Exec['yum-clean-metadata']
   }
@@ -79,7 +74,6 @@ class abiquo (
     descr        => "abiquo-rolling-${abiquo_version}",
     baseurl      => $rollingrepourl,
     gpgcheck     => $gpgcheckval,
-    gpgkey       => $gpgkeys,
     http_caching => 'none',
     require      => Yumrepo['Abiquo-Base'],
     notify       => Exec['yum-clean-metadata']
@@ -93,6 +87,11 @@ class abiquo (
 
   class { 'selinux':
     mode => 'disabled'
+  }
+
+  package { 'abiquo-release-ee':
+    ensure  => installed,
+    require => Yumrepo['Abiquo-Base']
   }
 
   host { 'Add hostname to /etc/hosts':
