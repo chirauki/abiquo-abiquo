@@ -4,18 +4,18 @@ class abiquo::monitoring::watchtower (
   $db_host                = 'localhost',
   $db_user                = 'root',
   $db_pass                = ''
-  $emmett_settings        = [ 
-    "emmett.kairosdb.host"   = "localhost",
-    "amqp.rabbitmq.host"     = "localhost",
-    "amqp.rabbitmq.username" = "abiquo",
-    "amqp.rabbitmq.password" = "abiquo"
-  ],
-  $delorean_settings      = [
-    "delorean.kairosdb.host" = "localhost",
-    "amqp.rabbitmq.host"     = "localhost",
-    "amqp.rabbitmq.username" = "abiquo",
-    "amqp.rabbitmq.password" = "abiquo"
-  ],
+  $emmett_settings        = {
+    "emmett.kairosdb.host"   => "localhost",
+    "amqp.rabbitmq.host"     => "localhost",
+    "amqp.rabbitmq.username" => "abiquo",
+    "amqp.rabbitmq.password" => "abiquo"
+  },
+  $delorean_settings      = {
+    "delorean.kairosdb.host" => "localhost",
+    "amqp.rabbitmq.host"     => "localhost",
+    "amqp.rabbitmq.username" => "abiquo",
+    "amqp.rabbitmq.password" => "abiquo"
+  },
 
 ) {
   firewall { '100 allow emmett access':

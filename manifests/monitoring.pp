@@ -3,20 +3,20 @@ class abiquo::monitoring (
   $kairosdb_version       = "0.9.4-6",
   $cassandra_cluster_name = "abiquo",
   $emmett_port            = 36638,
-  $emmett_settings        = [ 
-    "emmett.database.url"    = "jdbc:mysql://localhost:3306/watchtower",
-    "emmett.kairosdb.host"   = "localhost",
-    "amqp.rabbitmq.host"     = "localhost",
-    "amqp.rabbitmq.username" = "abiquo",
-    "amqp.rabbitmq.password" = "abiquo"
-  ],
-  $delorean_settings      = [
-    "delorean.database.url"  = "jdbc:mysql://localhost:3306/watchtower",
-    "delorean.kairosdb.host" = "localhost",
-    "amqp.rabbitmq.host"     = "localhost",
-    "amqp.rabbitmq.username" = "abiquo",
-    "amqp.rabbitmq.password" = "abiquo"
-  ]
+  $emmett_settings        = {
+    "emmett.database.url"    => "jdbc:mysql://localhost:3306/watchtower",
+    "emmett.kairosdb.host"   => "localhost",
+    "amqp.rabbitmq.host"     => "localhost",
+    "amqp.rabbitmq.username" => "abiquo",
+    "amqp.rabbitmq.password" => "abiquo"
+  },
+  $delorean_settings      = {
+    "delorean.database.url"  => "jdbc:mysql://localhost:3306/watchtower",
+    "delorean.kairosdb.host" => "localhost",
+    "amqp.rabbitmq.host"     => "localhost",
+    "amqp.rabbitmq.username" => "abiquo",
+    "amqp.rabbitmq.password" => "abiquo"
+  }
 ) {
   include abiquo::firewall
   include abiquo::ntp
