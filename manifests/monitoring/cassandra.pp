@@ -5,7 +5,7 @@ class abiquo::monitoring::cassandra (
   include cassandra::java
 
   # Install Cassandra on the node.
-  class { 'cassandra':
+  class { '::cassandra':
     authenticator   => 'PasswordAuthenticator',
     cluster_name    => $cassandra_cluster_name,
     endpoint_snitch => 'GossipingPropertyFileSnitch',
