@@ -55,7 +55,7 @@ class abiquo::monitoring::watchtower (
     path    => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin',
     command => "mysql $mysql_params < /usr/share/doc/abiquo-watchtower/database/src/watchtower-1.0.0.sql",
     unless  => "mysql $mysql_params -e \"show databases\" | grep watchtower",
-    require => Package['abiquo-delorean']
+    require => Package['abiquo-delorean'],
     notify  => Exec['Abiquo Watchtower liquibase update']
   }
 
